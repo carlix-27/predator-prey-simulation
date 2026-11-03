@@ -52,3 +52,6 @@ python docs/construir_informe.py
 # Regenerar PRESENTACION.html (fórmulas a MathML, figuras y código embebidos)
 python docs/construir_presentacion.py
 ```
+
+# Version web
+https://htmlpreview.github.io/?https://github.com/carlix-27/predator-prey-simulation/blob/main/docs/PRESENTACION.html
