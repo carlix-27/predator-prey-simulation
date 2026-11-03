@@ -1396,7 +1396,8 @@ function ir(i, fragsVisibles = false) {
   document.getElementById('seccion').textContent = '· ' + (s.dataset.seccion || '');
   document.getElementById('progreso').style.width = ((i + 1) / slides.length * 100) + '%';
   const notas = s.querySelector('aside.notas'); panelNotas.innerHTML = notas ? notas.innerHTML : '<p>Sin notas.</p>';
-  history.replaceState(null, '', '#' + (i + 1));
+  // URL explícita: con un <base> distinto (p. ej. visores como htmlpreview) '#n' apuntaría a otro origen
+  try { history.replaceState(null, '', location.pathname + location.search + '#' + (i + 1)); } catch (err) { /* el número de diapositiva en la URL es opcional */ }
 }
 function siguiente() {
   const oculto = slides[actual].querySelector('.frag:not(.visible)');
