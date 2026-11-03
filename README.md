@@ -12,6 +12,14 @@ Simulación numérica y análisis de estabilidad del modelo ecológico de tres n
 * **[`docs/INFORME_EDITABLE.html`](docs/INFORME_EDITABLE.html)**: versión web autocontenida, que funciona sin conexión.
 * **[`docs/figuras/`](docs/figuras/)**: figuras 1 a 6 del informe.
 
+## 🎤 Presentación
+
+* **[`docs/PRESENTACION.html`](docs/PRESENTACION.html)**: presentación interactiva de 17 diapositivas, más 4 de respaldo para las preguntas. Es un archivo autocontenido: se abre con doble clic en cualquier navegador y funciona sin internet.
+  * Las simulaciones se calculan en vivo con el mismo esquema RK2 del código: respuesta funcional, Euler vs. RK2, estabilidad absoluta, explorador de $K$ y caos.
+  * Atajos: `→`/`Espacio` avanza, `←` retrocede, `N` muestra las notas del orador, `T` el cronómetro de 10 min, `F` pantalla completa y `?` la ayuda.
+  * `PRESENTACION.html?estatico` muestra todo sin animaciones, para equipos lentos o para imprimir con Ctrl+P.
+* **[`docs/presentacion_fuente.html`](docs/presentacion_fuente.html)**: fuente editable, con fórmulas en LaTeX. `construir_presentacion.py` genera la versión final.
+
 ## 📚 Documentación de apoyo (`docs/`)
 
 * **[`docs/ESTRUCTURA_INFORME.md`](docs/ESTRUCTURA_INFORME.md)**: plan maestro y estructura del informe en formato paper.
@@ -40,4 +48,7 @@ python docs/generar_figuras.py
 
 # Regenerar INFORME_EDITABLE.docx / .html e INFORME.pdf (el PDF usa Edge o Chrome)
 python docs/construir_informe.py
+
+# Regenerar PRESENTACION.html (fórmulas a MathML, figuras y código embebidos)
+python docs/construir_presentacion.py
 ```
