@@ -92,6 +92,10 @@ def resolver_rk2(f_sistema, y0, t0, t_max, dt, params):
     
     Error de truncamiento local: O(dt^3)
     Error global acumulado: O(dt^2)
+
+    Un paso = una sola corrección (el corrector no se itera): iterarlo converge
+    a la regla del trapecio implícita, también de orden 2, así que solo agregaría
+    evaluaciones de f. Costo: 2 evaluaciones de f por paso.
     """
     num_pasos = int(np.ceil((t_max - t0) / dt)) + 1
     tiempos = np.linspace(t0, t0 + (num_pasos - 1) * dt, num_pasos)
@@ -110,7 +114,7 @@ def resolver_rk2(f_sistema, y0, t0, t_max, dt, params):
         y_predicho = np.maximum(yn + dt * k1, 0.0)
         k2 = f_sistema(tn + dt, y_predicho, params)
         
-        # Corrección ponderada de orden 2
+        # Corrección ponderada de orden 2 (se aplica una única vez)
         yn_siguiente = yn + (dt / 2.0) * (k1 + k2)
         yn_siguiente = np.maximum(yn_siguiente, 0.0)
         
@@ -126,25 +130,25 @@ def resolver_rk2(f_sistema, y0, t0, t_max, dt, params):
 if __name__ == '__main__':
     parametros = {
         'r': 1.0,           # Natalidad de la presa
-        'K': 100.0,         # Capacidad de carga presa
+        'K': 10.0,          # Capacidad de carga presa
         'd': 0.1,           # Mortalidad de la presa
         'b': 0.5,           # Conversión presa -> depredador
-        'm': 0.2,           # Mortalidad depredador
+        'm': 0.1,           # Mortalidad depredador
         'f': 0.2,           # Conversión presa -> superdepredador
         'g': 0.4,           # Conversión depredador -> superdepredador
-        'q': 0.1,           # Mortalidad superdepredador
+        'q': 0.12,          # Mortalidad superdepredador
         'a': 0.15,          # Tasa de ataque F_PN
         'c_ataque': 0.05,   # Tasa de ataque F_SN
         'e': 0.10,          # Tasa de ataque F_SP
-        'b1': 0.5,          # Coeficiente lineal N
+        'b1': 0.1,          # Coeficiente lineal N
         'b2': 0.5,          # Coeficiente lineal N
-        'b3': 0.5,          # Coeficiente lineal P
+        'b3': 0.1,          # Coeficiente lineal P
         'c1': 0.01,         # Coeficiente cuadrático N^2
         'c2': 0.01,         # Coeficiente cuadrático N^2
         'c3': 0.01          # Coeficiente cuadrático P^2
     }
 
-    estado_inicial = np.array([30.0, 10.0, 5.0])
+    estado_inicial = np.array([8.0, 2.0, 1.0])
     t_inicio = 0.0
     t_final = 250.0
     dt_elegido = 0.05   # Paso validado por doble paso (precisión y bajo costo)

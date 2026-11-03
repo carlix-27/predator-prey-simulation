@@ -131,26 +131,26 @@ def resolver_euler(f_sistema, y0, t0, t_max, dt, params):
 if __name__ == '__main__':
     parametros = {
         'r': 1.0,           # Natalidad de la presa
-        'K': 100.0,         # Capacidad de carga
+        'K': 10.0,          # Capacidad de carga (K alto -> paradoja del enriquecimiento)
         'd': 0.1,           # Mortalidad de la presa
         'b': 0.5,           # Eficiencia conversión presa -> depredador
-        'm': 0.2,           # Mortalidad depredador
+        'm': 0.1,           # Mortalidad depredador
         'f': 0.2,           # Eficiencia conversión presa -> superdepredador
         'g': 0.4,           # Eficiencia conversión depredador -> superdepredador
-        'q': 0.1,           # Mortalidad superdepredador
+        'q': 0.12,          # Mortalidad superdepredador
         'a': 0.15,          # Tasa de ataque depredador -> presa (0.01 - 0.5)
         'c_ataque': 0.05,   # Tasa de ataque superdepredador -> presa (0.01 - 0.5)
         'e': 0.10,          # Tasa de ataque superdepredador -> depredador (0.01 - 0.5)
-        'b1': 0.5,          # Coeficiente lineal N en F_PN (0.1 - 2.0)
+        'b1': 0.1,          # Coeficiente lineal N en F_PN (0.1 - 2.0)
         'b2': 0.5,          # Coeficiente lineal N en F_SN (0.1 - 2.0)
-        'b3': 0.5,          # Coeficiente lineal P en F_SP (0.1 - 2.0)
+        'b3': 0.1,          # Coeficiente lineal P en F_SP (0.1 - 2.0)
         'c1': 0.01,         # Coeficiente cuadrático N^2 en F_PN (0.0 - 0.1)
         'c2': 0.01,         # Coeficiente cuadrático N^2 en F_SN (0.0 - 0.1)
         'c3': 0.01          # Coeficiente cuadrático P^2 en F_SP (0.0 - 0.1)
     }
 
-    # Condiciones iniciales: Poblaciones iniciales no nulas
-    estado_inicial = np.array([30.0, 10.0, 5.0])  # [N0, P0, S0]
+    # Condiciones iniciales: presa cerca de su capacidad de carga, pocos depredadores
+    estado_inicial = np.array([8.0, 2.0, 1.0])  # [N0, P0, S0]
     t_inicio = 0.0
     t_final = 250.0   # Tiempo suficiente para verificar estado asintótico
 

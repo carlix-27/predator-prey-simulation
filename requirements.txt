@@ -1,0 +1,4 @@
+numpy
+matplotlib
+# Solo para construir el informe (.docx / .html / .pdf):
+pypandoc_binary

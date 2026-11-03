@@ -6,8 +6,8 @@ Este compendio de fuentes proporciona el sustento teórico y matemático necesar
 
 ## 1. Modelado Matemático y Sistemas Predador-Presa Tritróficos
 
-1. **Cosner, C., DeAngelis, D. L., Ault, J. S., & Perez-Sanchez, D. R. (1999).**
-   * *A Model for Movement and Aggregation of Fish with Rational Functional Response.*
+1. **Cosner, C., DeAngelis, D. L., Ault, J. S., & Olson, D. B. (1999).**
+   * *Effects of spatial grouping on the functional response of predators.* Theoretical Population Biology, 56(1), 65–75.
    * **Relevancia:** Origen y justificación biológica de las respuestas funcionales racionales del tipo $\frac{a N}{1 + b N + c N^2}$. Explica la no-monotonía (inhibición por alta densidad, formación de cardúmenes o defensa grupal) frente a las funciones de Holling Tipo II y III estándar.
    * **Concepto clave para la defensa:** ¿Por qué el término cuadrático $c N^2$ en el denominador? Porque a densidades extremadamente altas de presa, se produce interferencia o defensa colectiva (efecto *group defense* o confusión del depredador), reduciendo la tasa de captura per cápita.
 
@@ -58,4 +58,8 @@ Este compendio de fuentes proporciona el sustento teórico y matemático necesar
 * Para garantizar un estado asintótico de equilibrio:
   1. Mantener las tasas de ataque $a, c, e$ dentro de rangos moderados (ej. $0.05 - 0.20$).
   2. Ajustar los coeficientes de saturación $b_i$ y $c_i$ para que no ocurran saltos abruptos en el consumo.
-  3. Asegurar que las tasas de mortalidad $m, q$ estén equilibradas con la eficiencia de conversión $b, f, g$, logrando que la traza del Jacobiano en el punto de coexistencia tenga parte real negativa ($\text{Re}(\lambda_i) < 0$).
+  3. Asegurar que las tasas de mortalidad $m, q$ estén equilibradas con la eficiencia de conversión $b, f, g$, logrando que todos los autovalores del Jacobiano en el punto de coexistencia tengan parte real negativa ($\text{Re}(\lambda_i) < 0$).
+  4. Mantener la capacidad de carga $K$ por debajo del umbral de Hopf. Con los parámetros adoptados, $K_H \approx 11.18$; para $K$ mayor aparecen ciclos límite, duplicación de período y caos (*paradoja del enriquecimiento*, Rosenzweig 1971). El informe usa $K = 10$ (Sección 4.5).
+
+5. **Rosenzweig, M. L. (1971).** *Paradox of enrichment: destabilization of exploitation ecosystems in ecological time.* Science, 171(3969), 385–387.
+   * **Relevancia:** Aumentar la capacidad de carga de la presa desestabiliza el equilibrio presa-depredador. Es el mecanismo que se observa en el diagrama de bifurcación del informe (Figura 5).
