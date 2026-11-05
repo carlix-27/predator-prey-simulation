@@ -82,8 +82,8 @@ def resaltar_python(codigo):
 def extracto_rk2():
     """Bucle temporal de resolver_rk2, tal como está en rk2_cosner.py."""
     lineas = (DOCS / 'rk2_cosner.py').read_text(encoding='utf-8').split('\n')
-    inicio = next(i for i, l in enumerate(lineas) if l.strip().startswith('for n in range(num_pasos - 1):'))
-    fin = next(i for i in range(inicio, len(lineas)) if lineas[i].strip().startswith('solucion[n + 1] = yn_siguiente'))
+    inicio = next(i for i, l in enumerate(lineas) if l.strip().startswith('for n in range(pasos):'))
+    fin = next(i for i in range(inicio, len(lineas)) if lineas[i].strip().startswith('solucion[n + 1] = siguiente'))
     bloque = [l[4:] if l.startswith('    ') else l for l in lineas[inicio:fin + 1]]
     return resaltar_python('\n'.join(l.rstrip() for l in bloque))
 

@@ -138,8 +138,11 @@ def diferencia_doble_paso(resolver, dt, params, y0=ESTADO_INICIAL, t_max=T_FINAL
     """
     t_grueso, y_grueso = resolver(sistema_cosner, y0, T_INICIO, t_max, dt, params)
     t_fino, y_fino = resolver(sistema_cosner, y0, T_INICIO, t_max, dt / 2.0, params)
-    indices = np.round((t_grueso - T_INICIO) / (dt / 2.0)).astype(int)
-    validos = indices < len(t_fino)
+    indices = np.searchsorted(t_fino, t_grueso)
+    indices = np.minimum(indices, len(t_fino) - 1)
+    previos = np.maximum(indices - 1, 0)
+    indices = np.where(abs(t_fino[previos] - t_grueso) < abs(t_fino[indices] - t_grueso), previos, indices)
+    validos = np.isclose(t_grueso, t_fino[indices], rtol=1e-12, atol=1e-12)
     return np.max(np.abs(y_grueso[validos] - y_fino[indices[validos]]))
 
 

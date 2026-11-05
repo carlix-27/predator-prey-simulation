@@ -112,6 +112,9 @@ def buscar_navegador():
         r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe',
         r'C:\Program Files\Microsoft\Edge\Application\msedge.exe',
         r'C:\Program Files\Google\Chrome\Application\chrome.exe',
+        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
+        '/Applications/Chromium.app/Contents/MacOS/Chromium',
         shutil.which('msedge'), shutil.which('google-chrome'), shutil.which('chromium'),
     ]
     return next((c for c in candidatos if c and os.path.exists(c)), None)

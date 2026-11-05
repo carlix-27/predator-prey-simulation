@@ -94,32 +94,33 @@ def resolver_rk2(f_sistema, y0, t0, t_max, dt, params):
     Error global acumulado: O(dt^2)
 
     Un paso = una sola corrección (el corrector no se itera): iterarlo converge
-    a la regla del trapecio implícita, también de orden 2, así que solo agregaría
-    evaluaciones de f. Costo: 2 evaluaciones de f por paso.
+    a la regla del trapecio implícita, también de orden 2, pero con distintas
+    propiedades de estabilidad y costo. Costo: 2 evaluaciones de f por paso.
     """
-    num_pasos = int(np.ceil((t_max - t0) / dt)) + 1
-    tiempos = np.linspace(t0, t0 + (num_pasos - 1) * dt, num_pasos)
-    
-    solucion = np.zeros((num_pasos, len(y0)))
+    y0 = np.asarray(y0, dtype=float)
+    if (not np.isfinite(dt) or dt <= 0 or not np.isfinite(t0)
+            or not np.isfinite(t_max) or t_max < t0):
+        raise ValueError("Paso o intervalo temporal inválido")
+    if y0.shape != (3,) or not np.all(np.isfinite(y0)) or np.any(y0 < 0):
+        raise ValueError("El estado inicial debe tener tres poblaciones finitas no negativas")
+    pasos = int(np.ceil((t_max - t0) / dt))
+    tiempos = np.minimum(t0 + np.arange(pasos + 1) * dt, t_max)
+    tiempos[-1] = t_max
+    solucion = np.empty((pasos + 1, 3))
     solucion[0] = y0
-    
-    for n in range(num_pasos - 1):
-        tn = tiempos[n]
-        yn = solucion[n]
-        
-        # Etapa 1: Pendiente inicial (predictor Euler)
+    for n in range(pasos):
+        tn, yn = tiempos[n], solucion[n]
+        paso = tiempos[n + 1] - tn
         k1 = f_sistema(tn, yn, params)
-        
-        # Etapa 2: Pendiente tentativa al final del intervalo
-        y_predicho = np.maximum(yn + dt * k1, 0.0)
-        k2 = f_sistema(tn + dt, y_predicho, params)
-        
-        # Corrección ponderada de orden 2 (se aplica una única vez)
-        yn_siguiente = yn + (dt / 2.0) * (k1 + k2)
-        yn_siguiente = np.maximum(yn_siguiente, 0.0)
-        
-        solucion[n + 1] = yn_siguiente
-        
+        predictor = yn + paso * k1
+        if not np.all(np.isfinite(predictor)) or np.any(predictor < 0):
+            raise ValueError("Predictor no finito o negativo; reduzca el paso")
+        k2 = f_sistema(tn + paso, predictor, params)
+        siguiente = yn + paso / 2 * (k1 + k2)
+        if not np.all(np.isfinite(siguiente)) or np.any(siguiente < 0):
+            raise ValueError("Población no finita o negativa; reduzca el paso")
+        solucion[n + 1] = siguiente
+
     return tiempos, solucion
 
 

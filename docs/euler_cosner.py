@@ -101,25 +101,25 @@ def resolver_euler(f_sistema, y0, t0, t_max, dt, params):
         tiempos: Vector con la discretización temporal.
         solucion: Matriz de dimensiones (pasos, 3) con [N(t), P(t), S(t)].
     """
-    num_pasos = int(np.ceil((t_max - t0) / dt)) + 1
-    tiempos = np.linspace(t0, t0 + (num_pasos - 1) * dt, num_pasos)
-    
-    # Reserva de memoria para almacenar la trayectoria
-    solucion = np.zeros((num_pasos, len(y0)))
+    y0 = np.asarray(y0, dtype=float)
+    if (not np.isfinite(dt) or dt <= 0 or not np.isfinite(t0)
+            or not np.isfinite(t_max) or t_max < t0):
+        raise ValueError("Paso o intervalo temporal inválido")
+    if y0.shape != (3,) or not np.all(np.isfinite(y0)) or np.any(y0 < 0):
+        raise ValueError("El estado inicial debe tener tres poblaciones finitas no negativas")
+    pasos = int(np.ceil((t_max - t0) / dt))
+    tiempos = np.minimum(t0 + np.arange(pasos + 1) * dt, t_max)
+    tiempos[-1] = t_max
+    solucion = np.empty((pasos + 1, 3))
     solucion[0] = y0
-    
-    for n in range(num_pasos - 1):
-        tn = tiempos[n]
-        yn = solucion[n]
-        
-        # Paso de avance de Euler
-        derivadas = f_sistema(tn, yn, params)
-        yn_siguiente = yn + dt * derivadas
-        
-        # Control físico: las poblaciones no pueden ser negativas
-        yn_siguiente = np.maximum(yn_siguiente, 0.0)
-        solucion[n + 1] = yn_siguiente
-        
+    for n in range(pasos):
+        tn, yn = tiempos[n], solucion[n]
+        paso = tiempos[n + 1] - tn
+        siguiente = yn + paso * f_sistema(tn, yn, params)
+        if not np.all(np.isfinite(siguiente)) or np.any(siguiente < 0):
+            raise ValueError("Población no finita o negativa; reduzca el paso")
+        solucion[n + 1] = siguiente
+
     return tiempos, solucion
 
 

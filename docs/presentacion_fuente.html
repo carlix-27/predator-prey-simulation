@@ -828,16 +828,21 @@ function maximosLocales(x, desde) {
 }
 
 // Clasifica el régimen observado tras el transitorio (mismo criterio visual que el diagrama de bifurcación)
-function clasificarRegimen(sol, tDesde) {
-  const i0 = Math.ceil(tDesde / sol.dt);
-  let minN = Infinity, maxN = -Infinity, maxS = 0;
-  for (let i = i0; i < sol.N.length; i++) { minN = Math.min(minN, sol.N[i]); maxN = Math.max(maxN, sol.N[i]); maxS = Math.max(maxS, sol.S[i]); }
-  if (maxS < 0.7) return { tipo: 'colapso', texto: 'Colapso del superdepredador (S → 0)' };
-  if (maxN - minN < 1e-3) return { tipo: 'equilibrio', texto: 'Equilibrio estable' };
-  const maximos = maximosLocales(sol.N, i0).map(v => Math.round(v * 200) / 200);
-  const distintos = new Set(maximos).size;
-  if (distintos <= 4) return { tipo: 'ciclo', texto: `Ciclo límite (período ${distintos})`, periodo: distintos };
-  return { tipo: 'caos', texto: 'Caos (régimen aperiódico)' };
+function clasificarRegimen(sol, tDesde, p) {
+  const i0 = Math.ceil(tDesde / sol.dt), mid = Math.floor((i0 + sol.N.length - 1) / 2);
+  function amplitud(a, b) {
+    let lo = Infinity, hi = -Infinity;
+    for (let i = a; i <= b; i++) { lo = Math.min(lo, sol.N[i]); hi = Math.max(hi, sol.N[i]); }
+    return hi - lo;
+  }
+  const anterior = amplitud(i0, mid), reciente = amplitud(mid, sol.N.length - 1);
+  const j = sol.N.length - 1, y = [sol.N[j], sol.P[j], sol.S[j]];
+  const residuo = Math.max(...campo(y, p).map(Math.abs));
+  if (reciente < 1e-3 && residuo < 1e-4)
+    return { tipo: 'equilibrio', texto: 'Compatible con equilibrio; verificar estabilidad local' };
+  if (reciente < 0.8 * anterior)
+    return { tipo: 'transitorio', texto: 'Transitorio amortiguado; integración adicional necesaria' };
+  return { tipo: 'transitorio', texto: 'Régimen no concluyente; requiere más análisis' };
 }
 
 // =============================================================================
@@ -1297,8 +1302,8 @@ modulos.explorador = (() => {
     const K = +el.querySelector('#ex-k').value; el.querySelector('#ex-kv').textContent = K.toFixed(2);
     const t0 = performance.now();
     sol = integrar(pasoRK2, Y0, T, 0.05, { ...PARAMS, K });
-    const ms = performance.now() - t0, reg = clasificarRegimen(sol, 5000);
-    el.querySelector('#ex-badge').innerHTML = `<span aria-hidden="true">${ICONO[reg.tipo]}</span> ${reg.texto}`;
+    const ms = performance.now() - t0, reg = clasificarRegimen(sol, 5000, { ...PARAMS, K });
+    el.querySelector('#ex-badge').innerHTML = `<span aria-hidden="true">${ICONO[reg.tipo] || '○'}</span> ${reg.texto}`;
     el.querySelectorAll('[data-k]').forEach(b => b.classList.toggle('on', Math.abs(+b.dataset.k - K) < 1e-9));
     el.querySelector('#ex-lectura').innerHTML = `K = ${K.toFixed(2)} ${K < 11.18 ? '< ' : '> '}K<sub>H</sub> = 11.18 · integración completa con RK2 (Δt = 0.05, ${sol.t.length.toLocaleString('es-AR')} pasos) en <b>${ms.toFixed(0)} ms</b>.`;
     cancelar(); cancelar = animar(900, v => { u = suave(v); dibujar(); });
