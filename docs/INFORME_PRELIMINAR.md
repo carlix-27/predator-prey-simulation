@@ -1,14 +1,16 @@
 ---
 title: "Modelado y Simulación Numérica del Sistema Tritrófico de Cosner"
 subtitle: "Integración temporal (Euler vs. RK2), análisis de estabilidad y transición al caos"
-author: "[Integrantes del grupo]"
-date: "Cálculo Numérico · [Universidad / Facultad] · [Fecha de entrega]"
+author: "Valentin Flores y Carlos Acuña"
+date: "Cálculo Numérico · Universidad Austral · 04/11/2026"
 lang: es
 ---
 
+Las densidades y el tiempo se expresan en las escalas numéricas del modelo asignado; la consigna no especifica unidades físicas ni una transformación de adimensionalización.
+
 ## Resumen
 
-En este trabajo se modela y analiza numéricamente la dinámica de un sistema ecológico tritrófico compuesto por una presa ($N$), un depredador intermedio ($P$) y un superdepredador omnívoro ($S$), gobernado por el modelo no lineal de Cosner con respuestas funcionales racionales cuadráticas. Para resolver el problema de valor inicial se implementaron los métodos de Euler explícito y Runge-Kutta de segundo orden (RK2/Heun). Se verificó empíricamente el orden de convergencia de ambos esquemas (1.04 y 2.00, respectivamente) y se justificó la elección del paso $\Delta t = 0.05$ mediante el criterio de doble paso, con una discrepancia máxima de $1.5\times10^{-4}$, inferior a la tolerancia de $10^{-3}$. Se mostró además que la parametrización inicial conducía a la extinción del depredador y del superdepredador. Por eso se calibró un conjunto de parámetros dentro de los rangos de la consigna que produce coexistencia asintóticamente estable en $(N^*, P^*, S^*) = (5.105,\ 4.308,\ 1.878)$. Finalmente, un diagrama de bifurcación respecto de la capacidad de carga $K$ muestra la secuencia equilibrio estable → bifurcación de Hopf ($K_H \approx 11.18$) → duplicación de período → caos (exponente de Lyapunov positivo) → colapso del superdepredador, y permite delimitar la región de parámetros que evita el régimen caótico.
+En este trabajo se modela y analiza numéricamente la dinámica de un sistema ecológico tritrófico compuesto por una presa ($N$), un depredador intermedio ($P$) y un superdepredador omnívoro ($S$), gobernado por el modelo no lineal de Cosner con respuestas funcionales racionales cuadráticas. Para resolver el problema de valor inicial se implementaron los métodos de Euler explícito y Runge-Kutta de segundo orden (RK2/Heun). Se verificó empíricamente el orden de convergencia de ambos esquemas (1.04 y 2.00, respectivamente) y se justificó la elección del paso $\Delta t = 0.05$ mediante el criterio de doble paso, con una discrepancia máxima de $1.5\times10^{-4}$, inferior a la tolerancia de $10^{-3}$. Se mostró además que la parametrización inicial conducía a la extinción del depredador y del superdepredador. Por eso se calibró un conjunto de parámetros dentro de los rangos de la consigna que produce coexistencia asintóticamente estable en $(N^*, P^*, S^*) = (5.105,\ 4.308,\ 1.878)$. Un barrido de $K$ muestra un cruce de estabilidad local cerca de $K=11.18$ y comportamiento irregular; las estimaciones de Lyapunov se comparan con distintos pasos y ventanas.
 
 ## 1. Introducción
 
@@ -101,7 +103,7 @@ por lo que $dP/dt < 0$ para todo $N$ y el depredador se extingue. Sin presas int
 | Borde $N$–$P$ | $(1.577,\ 5.852,\ 0)$ | $-0.0137 \pm 0.247i,\ +0.0101$ | Silla: $S$ invade |
 | **Coexistencia** | $(5.105,\ 4.308,\ 1.878)$ | $-0.1433,\ -0.0386 \pm 0.1033i$ | **Foco estable** |
 
-Los tres equilibrios de borde son invadibles, de modo que ninguna especie se extingue. El equilibrio interior tiene un par de autovalores complejos con parte real negativa, lo que anticipa una convergencia en espiral. El período de la oscilación amortiguada es $2\pi / 0.1033 \approx 61$ y el tiempo característico de decaimiento es $1/0.0386 \approx 26$ unidades.
+Los tres equilibrios de borde estudiados son invadibles; esto no demuestra persistencia global. El equilibrio interior tiene un par de autovalores complejos con parte real negativa, lo que anticipa una convergencia en espiral. El período de la oscilación amortiguada es $2\pi / 0.1033 \approx 61$ y el tiempo característico de decaimiento es $1/0.0386 \approx 26$ unidades.
 
 ## 3. Metodología Numérica
 
@@ -111,7 +113,7 @@ $$
 \frac{d\mathbf{y}}{dt} = \mathbf{f}(t, \mathbf{y}), \qquad \mathbf{y}(0) = \mathbf{y}_0
 $$
 
-En ambos métodos, después de cada paso se proyecta la solución sobre el ortante no negativo ($\mathbf{y}_{n+1} \leftarrow \max(\mathbf{y}_{n+1}, 0)$), ya que una densidad poblacional no puede ser negativa.
+Los integradores rechazan estados no finitos o negativos, incluso el predictor de Heun. No se aplica proyección; si ocurre un rechazo debe reducirse el paso y revisarse la simulación.
 
 ### 3.1. Método de Euler explícito (orden 1)
 
@@ -149,7 +151,7 @@ $$
 \mathbf{y}_{n+1} = \mathbf{y}_n + \frac{\Delta t}{2}\left[\mathbf{f}(t_n, \mathbf{y}_n) + \mathbf{f}(t_{n+1}, \mathbf{y}_{n+1})\right]
 $$
 
-La regla del trapecio también tiene error global $\mathcal{O}(\Delta t^2)$. Iterar el corrector, entonces, no mejora el orden del método: solo agrega una evaluación de $\mathbf{f}$ por cada iteración. Con una única corrección ($j = 0$) el esquema ya alcanza el orden 2 con el costo mínimo de dos evaluaciones por paso, y sigue siendo explícito. El orden observado de 2.00 de la Sección 4.4 lo confirma. Todo el costo computacional reportado en este informe cuenta exactamente dos evaluaciones por paso.
+La regla del trapecio también tiene error global $\mathcal{O}(\Delta t^2)$. Iterar el corrector no aumenta el orden, pero cambia la aproximación, el costo y puede cambiar sus propiedades de estabilidad. Con una única corrección ($j = 0$) el esquema ya alcanza el orden 2 con dos evaluaciones por paso, y sigue siendo explícito. El orden observado de 2.00 de la Sección 4.4 es coherente con ello. Euler usa una evaluación por paso.
 
 ### 3.3. Estabilidad absoluta
 
@@ -182,7 +184,7 @@ $$
 \lambda_{\max} \approx \frac{1}{n\tau} \sum_{k=1}^{n} \ln\frac{d_k}{d_0}
 $$
 
-Un valor $\lambda_{\max} > 0$ indica divergencia exponencial de trayectorias vecinas (caos), $\lambda_{\max} \approx 0$ indica un ciclo límite y $\lambda_{\max} < 0$ indica un equilibrio estable.
+Un exponente positivo estimado indica separación exponencial local durante el período medido; valores próximos a cero o negativos no identifican por sí solos el régimen. Deben analizarse transitorios, paso y tiempo de promedio.
 
 ## 4. Resultados y Discusión
 
@@ -218,7 +220,7 @@ Con los autovalores de la Sección 2.4, el paso máximo linealmente estable en e
 
 ### 4.4. Selección y justificación del paso $\Delta t$
 
-| $\Delta t$ | $D(\Delta t)$ Euler | $D(\Delta t)$ RK2 | Orden local Euler | Orden local RK2 |
+| $\Delta t$ | $D(\Delta t)$ Euler | $D(\Delta t)$ RK2 | Orden observado Euler | Orden observado RK2 |
 | :---: | :---: | :---: | :---: | :---: |
 | $0.5$ | $4.77\times10^{-1}$ | $1.49\times10^{-2}$ | $1.46$ | $1.99$ |
 | $0.25$ | $1.73\times10^{-1}$ | $3.74\times10^{-3}$ | $1.16$ | $2.00$ |
@@ -227,6 +229,8 @@ Con los autovalores de la Sección 2.4, el paso máximo linealmente estable en e
 | $0.025$ | $1.40\times10^{-2}$ | $3.75\times10^{-5}$ | $1.02$ | $2.00$ |
 | $0.01$ | $5.50\times10^{-3}$ | $5.99\times10^{-6}$ | — | — |
 
+La tolerancia $10^{-3}$ se aplica a la discrepancia $D$, no al error. En régimen asintótico, para orden $p$, las estimaciones son $E_h \approx D/(1-2^{-p})$ y $E_{h/2} \approx D/(2^p-1)$; no son errores exactos ni garantías rigurosas. Para Euler con $h=0.001$, $E_h \approx 1.0911\times 10^{-3}$; para RK2 con $h=0.05$, $E_h \approx 1.9975\times10^{-4}$.
+
 ![Orden de convergencia](figuras/fig4_orden_convergencia.png)
 
 *__Figura 4.__ Criterio de doble paso en escala log-log. Las pendientes ajustadas para $\Delta t \le 0.1$ son 1.04 (Euler) y 2.00 (RK2) y coinciden con los órdenes teóricos.*
@@ -234,7 +238,7 @@ Con los autovalores de la Sección 2.4, el paso máximo linealmente estable en e
 * **Orden verificado:** al dividir $\Delta t$ por la mitad, la discrepancia de Euler se reduce a la mitad y la de RK2 a la cuarta parte, como predice la teoría.
 * **La restricción efectiva es la precisión:** los pasos que cumplen la tolerancia son mucho menores que los límites de estabilidad lineal (6.35 y 13.96).
 * **Paso adoptado:** RK2 satisface la tolerancia $10^{-3}$ desde $\Delta t = 0.1$. Se adopta $\Delta t = 0.05$, que deja un margen de casi 7 veces ($D = 1.5\times10^{-4}$) con 5000 pasos, es decir, $10^4$ evaluaciones de $\mathbf{f}$.
-* **Costo comparado:** Euler no alcanza la tolerancia ni con $\Delta t = 0.01$. Extrapolando $D \approx 0.55\,\Delta t$, necesitaría $\Delta t \approx 1.8\times10^{-3}$, unas $1.4\times10^{5}$ evaluaciones: aproximadamente **14 veces más costo** que RK2 para la misma precisión.
+* **Costo comparado:** Para el criterio común $D<10^{-3}$, Euler con $h=0.001$ da $D=5.4532\times10^{-4}$ y requiere 250 000 evaluaciones para resolver; RK2 con $h=0.05$ da $D=1.4982\times10^{-4}$ y requiere 10 000. Validar requiere además resolver la malla refinada: 500 000 y 20 000 evaluaciones adicionales, respectivamente. Ambos cumplen la misma tolerancia, aunque sus discrepancias no son iguales. Euler con $h=0.0005$ da $D=2.7253\times10^{-4}$.
 
 ### 4.5. Zonas de inestabilidad: bifurcación de Hopf y caos
 
@@ -242,41 +246,38 @@ La parametrización elegida debe quedar lejos de la región caótica. Para delim
 
 ![Diagrama de bifurcación](figuras/fig5_bifurcacion_K.png)
 
-*__Figura 5.__ Diagrama de bifurcación respecto de $K$: máximos locales de $N(t)$ y $S(t)$ tras descartar el transitorio ($t > 2000$). Un único punto indica un equilibrio, $p$ puntos un ciclo de período $p$ y una nube un régimen aperiódico.*
+*__Figura 5.__ Diagrama de bifurcación respecto de $K$: máximos locales de $N(t)$ y $S(t)$ tras descartar el transitorio ($t > 2000$). Un único máximo repetido puede corresponder a un ciclo simple; un equilibrio requiere amplitud tendiente a cero y residuo del campo pequeño. Varios máximos requieren estudiar su repetición y los transitorios; una nube sugiere irregularidad y requiere comprobaciones adicionales para hablar de caos.*
 
 | $K$ | $\lambda_{\max}$ (Lyapunov) | Régimen |
 | :---: | :---: | :--- |
 | $10$ (adoptado) | $-0.0383$ | Equilibrio estable ($\approx \operatorname{Re}\lambda_{2,3} = -0.0386$) |
 | $11.5$ | $+0.0001$ | Ciclo límite (período 1) |
 | $12$ | $-0.0001$ | Ciclo límite (período 2) |
-| $12.25$ | $+0.0056$ | Caos |
-| $13.5$ | $+0.0092$ | Caos |
+| $12.25$ | $+0.0059$ | Irregularidad observada |
+| $13.5$ | $+0.0073$ | Comportamiento irregular; estimación de tiempo finito |
 
-La Figura 5 y la tabla muestran la ruta completa al caos por enriquecimiento:
+El cruce de un par de autovalores cerca de $K=11.18$ aporta evidencia de una bifurcación de Hopf; no demuestra por sí solo que aparezca un ciclo estable. Los máximos sugieren cambios de régimen, pero deben comprobarse la duración del transitorio y la repetición. La nomenclatura período $p$ indica $p$ máximos distintos que se repiten en una órbita; no se infiere un equilibrio a partir de un único máximo.
 
-1. **$K < K_H \approx 11.18$:** el equilibrio de coexistencia es asintóticamente estable.
-2. **$K = K_H$:** un par de autovalores complejos cruza el eje imaginario (bifurcación de Hopf) y nace un ciclo límite estable.
-3. **$K \approx 11.9$:** el ciclo duplica su período.
-4. **$12.2 \lesssim K \lesssim 14$:** régimen caótico con $\lambda_{\max} > 0$, intercalado con ventanas periódicas.
-5. **$K \gtrsim 14$:** las oscilaciones de la presa se vuelven tan profundas que el superdepredador colapsa hacia la extinción.
+![Régimen irregular](figuras/fig6_regimen_caotico.png)
 
-![Régimen caótico](figuras/fig6_regimen_caotico.png)
+*__Figura 6.__ Comportamiento observado para $K=13.5$ y sensibilidad a condiciones iniciales. Las trayectorias a tiempos largos no deben compararse punto a punto para validar un régimen caótico. La pendiente indicada es una estimación de tiempo finito, sensible al paso y a la ventana de integración.*
 
-*__Figura 6.__ Régimen caótico con $K = 13.5$. Izquierda: atractor extraño. Centro: dos trayectorias cuya condición inicial difiere en $10^{-6}$ se separan por completo a partir de $t \approx 2000$. Derecha: la separación crece como $e^{\lambda t}$, con $\lambda = 0.0092$, hasta saturar en el tamaño del atractor.*
+Para $K=13.5$ se recalculó el exponente máximo mediante dos trayectorias renormalizadas. Con transitorio 2000 y promedio 4000, para $h=0.05$, $0.025$ y $0.0125$ se obtienen respectivamente 0.00731, 0.00819 y 0.00799; con transitorio 4000 y promedio 8000 se obtienen 0.00833, 0.00831 y 0.00938. El signo positivo persiste, pero la variación muestra que las cifras no están convergidas a cuatro decimales. Son estimaciones de tiempo finito, no una prueba rigurosa de caos.
 
-Este comportamiento es consistente con el modelo tritrófico de Hastings y Powell (1991) y con el teorema de Poincaré-Bendixson: en dimensión 2 el caos es imposible, pero el tercer nivel trófico lo habilita. La consigna asocia el caos a interacciones no locales y retardos. Este análisis muestra que el modelo local y sin retardo también llega al caos con solo enriquecer el ambiente. El valor adoptado $K = 10$ queda un 11% por debajo del umbral de Hopf, dentro de la región de equilibrio estable.
+Para el conjunto adoptado $K=10$, el equilibrio interior es localmente estable y la trayectoria estudiada se aproxima a él. No se deduce de ello estabilidad global ni estabilidad para todo $K<K_H$. El teorema de Poincaré–Bendixson se aplica a EDO autónomas planas bajo sus hipótesis, no a cualquier sistema bidimensional.
 
 ## 5. Conclusiones
 
 * Se implementaron los métodos de Euler explícito y RK2 (Heun) en códigos modulares para el modelo tritrófico, y se verificaron empíricamente sus órdenes de convergencia: 1.04 y 2.00.
-* El paso $\Delta t = 0.05$ con RK2 queda justificado por el criterio de doble paso ($D = 1.5\times10^{-4} < 10^{-3}$). Euler requeriría unas 14 veces más evaluaciones para igual precisión. Con pasos grandes ($\Delta t = 2$), Euler produce dinámicas espurias, como la extinción numérica del superdepredador, aunque el paso sea linealmente estable en el equilibrio.
+* El paso $\Delta t = 0.05$ con RK2 queda justificado por el criterio de doble paso ($D = 1.5\times10^{-4} < 10^{-3}$). Para $D<10^{-3}$, los pasos probados de Euler y RK2 requieren respectivamente 250 000 y 10 000 evaluaciones para resolver; la validación agrega las mallas refinadas. Con pasos grandes ($\Delta t = 2$), Euler produce dinámicas espurias, como la extinción numérica del superdepredador, aunque el paso sea linealmente estable en el equilibrio.
 * La parametrización original no permitía la coexistencia porque la tasa máxima de consumo del depredador no compensaba su mortalidad. Se calibró un conjunto de parámetros dentro de los rangos de la consigna que garantiza un equilibrio de coexistencia asintóticamente estable, con todos los equilibrios de borde invadibles.
-* El diagrama de bifurcación respecto de $K$ revela la paradoja del enriquecimiento y una ruta al caos por duplicación de período, confirmada con exponentes de Lyapunov positivos. La elección $K = 10 < K_H \approx 11.18$ asegura operar fuera de esa región.
+* El barrido de $K$ sugiere cambios de estabilidad y comportamiento irregular; su clasificación asintótica requiere estudios adicionales de transitorios y refinamiento. Para $K=10$ se verifica estabilidad local del equilibrio estudiado.
 * El término cuadrático $c_i x^2$ de la respuesta funcional acota el consumo máximo en $\alpha/(\beta + 2\sqrt{\gamma})$. Este valor resulta ser la magnitud clave para decidir si cada nivel trófico puede persistir.
 
 ## 6. Referencias
 
-1. Cosner, C., DeAngelis, D. L., Ault, J. S., & Olson, D. B. (1999). Effects of spatial grouping on the functional response of predators. *Theoretical Population Biology*, 56(1), 65–75.
+1. Cátedra de Cálculo Numérico, Universidad Austral. *Problema 10*: consigna del modelo asignado.
+2. Cosner, C., DeAngelis, D. L., Ault, J. S., & Olson, D. B. (1999). Effects of spatial grouping on the functional response of predators. *Theoretical Population Biology*, 56(1), 65–75.
 2. Burden, R. L., & Faires, J. D. (2010). *Numerical Analysis* (9th ed.). Brooks/Cole.
 3. Strogatz, S. H. (2018). *Nonlinear Dynamics and Chaos: With Applications to Physics, Biology, Chemistry, and Engineering* (2nd ed.). CRC Press.
 4. Hastings, A., & Powell, T. (1991). Chaos in a three-species food chain. *Ecology*, 72(3), 896–903.
@@ -409,25 +410,25 @@ def resolver_euler(f_sistema, y0, t0, t_max, dt, params):
         tiempos: Vector con la discretización temporal.
         solucion: Matriz de dimensiones (pasos, 3) con [N(t), P(t), S(t)].
     """
-    num_pasos = int(np.ceil((t_max - t0) / dt)) + 1
-    tiempos = np.linspace(t0, t0 + (num_pasos - 1) * dt, num_pasos)
-    
-    # Reserva de memoria para almacenar la trayectoria
-    solucion = np.zeros((num_pasos, len(y0)))
+    y0 = np.asarray(y0, dtype=float)
+    if (not np.isfinite(dt) or dt <= 0 or not np.isfinite(t0)
+            or not np.isfinite(t_max) or t_max < t0):
+        raise ValueError("Paso o intervalo temporal inválido")
+    if y0.shape != (3,) or not np.all(np.isfinite(y0)) or np.any(y0 < 0):
+        raise ValueError("El estado inicial debe tener tres poblaciones finitas no negativas")
+    pasos = int(np.ceil((t_max - t0) / dt))
+    tiempos = np.minimum(t0 + np.arange(pasos + 1) * dt, t_max)
+    tiempos[-1] = t_max
+    solucion = np.empty((pasos + 1, 3))
     solucion[0] = y0
-    
-    for n in range(num_pasos - 1):
-        tn = tiempos[n]
-        yn = solucion[n]
-        
-        # Paso de avance de Euler
-        derivadas = f_sistema(tn, yn, params)
-        yn_siguiente = yn + dt * derivadas
-        
-        # Control físico: las poblaciones no pueden ser negativas
-        yn_siguiente = np.maximum(yn_siguiente, 0.0)
-        solucion[n + 1] = yn_siguiente
-        
+    for n in range(pasos):
+        tn, yn = tiempos[n], solucion[n]
+        paso = tiempos[n + 1] - tn
+        siguiente = yn + paso * f_sistema(tn, yn, params)
+        if not np.all(np.isfinite(siguiente)) or np.any(siguiente < 0):
+            raise ValueError("Población no finita o negativa; reduzca el paso")
+        solucion[n + 1] = siguiente
+
     return tiempos, solucion
 
 
@@ -581,32 +582,33 @@ def resolver_rk2(f_sistema, y0, t0, t_max, dt, params):
     Error global acumulado: O(dt^2)
 
     Un paso = una sola corrección (el corrector no se itera): iterarlo converge
-    a la regla del trapecio implícita, también de orden 2, así que solo agregaría
-    evaluaciones de f. Costo: 2 evaluaciones de f por paso.
+    a la regla del trapecio implícita, también de orden 2, pero con distintas
+    propiedades de estabilidad y costo. Costo: 2 evaluaciones de f por paso.
     """
-    num_pasos = int(np.ceil((t_max - t0) / dt)) + 1
-    tiempos = np.linspace(t0, t0 + (num_pasos - 1) * dt, num_pasos)
-    
-    solucion = np.zeros((num_pasos, len(y0)))
+    y0 = np.asarray(y0, dtype=float)
+    if (not np.isfinite(dt) or dt <= 0 or not np.isfinite(t0)
+            or not np.isfinite(t_max) or t_max < t0):
+        raise ValueError("Paso o intervalo temporal inválido")
+    if y0.shape != (3,) or not np.all(np.isfinite(y0)) or np.any(y0 < 0):
+        raise ValueError("El estado inicial debe tener tres poblaciones finitas no negativas")
+    pasos = int(np.ceil((t_max - t0) / dt))
+    tiempos = np.minimum(t0 + np.arange(pasos + 1) * dt, t_max)
+    tiempos[-1] = t_max
+    solucion = np.empty((pasos + 1, 3))
     solucion[0] = y0
-    
-    for n in range(num_pasos - 1):
-        tn = tiempos[n]
-        yn = solucion[n]
-        
-        # Etapa 1: Pendiente inicial (predictor Euler)
+    for n in range(pasos):
+        tn, yn = tiempos[n], solucion[n]
+        paso = tiempos[n + 1] - tn
         k1 = f_sistema(tn, yn, params)
-        
-        # Etapa 2: Pendiente tentativa al final del intervalo
-        y_predicho = np.maximum(yn + dt * k1, 0.0)
-        k2 = f_sistema(tn + dt, y_predicho, params)
-        
-        # Corrección ponderada de orden 2 (se aplica una única vez)
-        yn_siguiente = yn + (dt / 2.0) * (k1 + k2)
-        yn_siguiente = np.maximum(yn_siguiente, 0.0)
-        
-        solucion[n + 1] = yn_siguiente
-        
+        predictor = yn + paso * k1
+        if not np.all(np.isfinite(predictor)) or np.any(predictor < 0):
+            raise ValueError("Predictor no finito o negativo; reduzca el paso")
+        k2 = f_sistema(tn + paso, predictor, params)
+        siguiente = yn + paso / 2 * (k1 + k2)
+        if not np.all(np.isfinite(siguiente)) or np.any(siguiente < 0):
+            raise ValueError("Población no finita o negativa; reduzca el paso")
+        solucion[n + 1] = siguiente
+
     return tiempos, solucion
 
 
@@ -818,8 +820,11 @@ def diferencia_doble_paso(resolver, dt, params, y0=ESTADO_INICIAL, t_max=T_FINAL
     """
     t_grueso, y_grueso = resolver(sistema_cosner, y0, T_INICIO, t_max, dt, params)
     t_fino, y_fino = resolver(sistema_cosner, y0, T_INICIO, t_max, dt / 2.0, params)
-    indices = np.round((t_grueso - T_INICIO) / (dt / 2.0)).astype(int)
-    validos = indices < len(t_fino)
+    indices = np.searchsorted(t_fino, t_grueso)
+    indices = np.minimum(indices, len(t_fino) - 1)
+    previos = np.maximum(indices - 1, 0)
+    indices = np.where(abs(t_fino[previos] - t_grueso) < abs(t_fino[indices] - t_grueso), previos, indices)
+    validos = np.isclose(t_grueso, t_fino[indices], rtol=1e-12, atol=1e-12)
     return np.max(np.abs(y_grueso[validos] - y_fino[indices[validos]]))
 
 
@@ -891,7 +896,7 @@ def figura_4_orden_convergencia(params):
     D_rk2 = np.array([diferencia_doble_paso(resolver_rk2, dt, params) for dt in pasos])
 
     print("\n  Tabla de doble paso  D(dt) = max_n ||y_dt - y_dt/2||_inf")
-    print(f"  {'dt':>7} | {'Euler':>11} | {'RK2':>11} | {'orden local Euler':>15} | {'RK2':>6}")
+    print(f"  {'dt':>7} | {'Euler':>11} | {'RK2':>11} | {'orden observado Euler':>15} | {'RK2':>6}")
     for i, (dt, de, dr) in enumerate(zip(pasos, D_euler, D_rk2)):
         if i + 1 < len(pasos):
             r = pasos[i] / pasos[i + 1]
@@ -955,9 +960,9 @@ def figura_5_bifurcacion_K(params, K_hopf):
     """
     Diagrama de bifurcación respecto de la capacidad de carga K: para cada K se
     descarta el transitorio y se grafican los máximos locales de N(t) y S(t).
-        1 punto   -> equilibrio estable (se grafica el valor de equilibrio)
-        p puntos  -> ciclo límite de período p
-        nube      -> régimen aperiódico (caótico)
+        Un máximo repetido puede corresponder a un ciclo; una nube indica
+        irregularidad y requiere otras pruebas para diagnosticar caos.
+        Si no se detectan máximos se grafica el último valor, no necesariamente un equilibrio.
     """
     valores_K = np.arange(9.0, 15.001, 0.025)
     t_transitorio, t_total = 2000.0, 3000.0

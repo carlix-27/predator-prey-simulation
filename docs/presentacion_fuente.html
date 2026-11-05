@@ -201,7 +201,7 @@ aside.notas { display: none; }
     <div class="kicker a" style="--d:0">Cálculo Numérico · Trabajo Práctico</div>
     <h1 class="a" style="--d:120">Modelado y simulación numérica del sistema tritrófico de Cosner</h1>
     <div class="sub a" style="--d:260">Integración temporal con Euler y Runge-Kutta 2, análisis de estabilidad y transición al caos</div>
-    <div class="meta a" style="--d:420">[Integrantes del grupo] · [Universidad / Facultad] · [Fecha]</div>
+    <div class="meta a" style="--d:420">Valentin Flores y Carlos Acuña · Universidad Austral · 04/11/2026</div>
   </div>
   <aside class="notas">
     <h4>Portada · 0:00 – 0:20</h4>
@@ -475,7 +475,7 @@ aside.notas { display: none; }
 \[ D(\Delta t) = \max_n \left\| \mathbf{y}_{\Delta t}(t_n) - \mathbf{y}_{\Delta t/2}(t_n) \right\|_\infty < 10^{-3} \]
       </div>
       <table class="t a" style="--d:200">
-        <tr><th>\(\Delta t\)</th><th>\(D\) Euler</th><th>\(D\) RK2</th><th>Orden local RK2</th></tr>
+        <tr><th>\(\Delta t\)</th><th>\(D\) Euler</th><th>\(D\) RK2</th><th>Orden observado RK2</th></tr>
         <tr><td>0.5</td><td class="num">4.77·10⁻¹</td><td class="num">1.49·10⁻²</td><td>1.99</td></tr>
         <tr><td>0.25</td><td class="num">1.73·10⁻¹</td><td class="num">3.74·10⁻³</td><td>2.00</td></tr>
         <tr><td>0.1</td><td class="num">6.00·10⁻²</td><td class="num">5.99·10⁻⁴</td><td>2.00</td></tr>
@@ -521,7 +521,7 @@ aside.notas { display: none; }
   <aside class="notas">
     <h4>Resultado · 6:40 – 7:20</h4>
     <ul><li>Oscilaciones amortiguadas con período ≈ 61 (parte imaginaria de los autovalores), que se apagan con tiempo característico ≈ 26 (parte real).</li>
-    <li>En 3D: espiral que se cierra sobre el equilibrio. Todos los equilibrios de borde son invadibles: nadie se extingue.</li></ul>
+    <li>En 3D: espiral que se cierra sobre el equilibrio. Los equilibrios de borde estudiados son invadibles; eso no demuestra persistencia global.</li></ul>
   </aside>
 </section>
 
@@ -533,16 +533,16 @@ aside.notas { display: none; }
     <figcaption>Máximos locales de N(t) y S(t) tras el transitorio, para cada capacidad de carga K (RK2, Δt = 0.05). Paradoja del enriquecimiento (Rosenzweig, 1971).</figcaption>
   </figure>
   <div class="regimenes">
-    <div class="tarjeta acento frag"><b>\(K < 11.18\)</b><p>Equilibrio estable (adoptado \(K = 10\)).</p></div>
-    <div class="tarjeta frag"><b>\(K_H \approx 11.18\)</b><p>Bifurcación de Hopf (por bisección): nace un ciclo límite.</p></div>
-    <div class="tarjeta frag"><b>\(K \approx 11.9\)</b><p>Duplicación de período.</p></div>
-    <div class="tarjeta frag"><b>\(12.2 \lesssim K \lesssim 14\)</b><p>Caos, con ventanas periódicas.</p></div>
-    <div class="tarjeta frag"><b>\(K \gtrsim 14\)</b><p>Colapso del superdepredador.</p></div>
+    <div class="tarjeta acento frag"><b>\(K < 11.18\)</b><p>Para \(K=10\), equilibrio localmente estable.</p></div>
+    <div class="tarjeta frag"><b>\(K_H \approx 11.18\)</b><p>Cruce de autovalores: evidencia de Hopf.</p></div>
+    <div class="tarjeta frag"><b>\(K \approx 11.9\)</b><p>Máximos repetidos: estudiar transitorios.</p></div>
+    <div class="tarjeta frag"><b>\(12.2 \lesssim K \lesssim 14\)</b><p>Máximos irregulares; requieren más pruebas.</p></div>
+    <div class="tarjeta frag"><b>\(K \gtrsim 14\)</b><p>Densidad reducida; estudiar tendencia.</p></div>
   </div>
   <aside class="notas">
     <h4>Bifurcación · 7:20 – 8:00</h4>
-    <ul><li>Variamos solo K. Un punto por K = equilibrio; dos ramas = ciclo; nube = caos.</li>
-    <li>Ruta clásica: Hopf → duplicación de período → caos, como en Hastings-Powell (1991).</li>
+    <ul><li>Variamos solo K. Un máximo repetido puede indicar un ciclo; el equilibrio requiere amplitud y residuo pequeños. Una nube requiere más pruebas para afirmar caos.</li>
+    <li>Un cruce de autovalores no demuestra la estabilidad de un ciclo.</li>
     <li>Nuestro K = 10 está un 11 % por debajo del umbral de Hopf.</li></ul>
   </aside>
 </section>
@@ -568,21 +568,21 @@ aside.notas { display: none; }
   <p class="mini a" style="--d:300; margin-top:6px" id="ex-lectura">Cada cambio integra el modelo completo con RK2 (\(\Delta t = 0.05\), 120 000 pasos) en el navegador.</p>
   <aside class="notas">
     <h4>Explorador (demo opcional) · 8:00 – 8:40</h4>
-    <ul><li>10 → equilibrio; 11.5 → ciclo; 12 → período 2; 13 → ventana de período 3; 13.5 → caos; 14.5 → S colapsa.</li>
+    <ul><li>El diagnóstico es provisional y compara amplitudes y residuo; una integración más larga puede ser necesaria.</li>
     <li>Si falta tiempo, saltar esta diapositiva.</li></ul>
   </aside>
 </section>
 
 <!-- =========================================================== 14. CAOS -->
 <section class="slide" data-id="caos" data-seccion="Caos">
-  <header class="cab"><div class="kicker">8 · Estabilidad y caos</div><h2>Caos: sensibilidad a las condiciones iniciales (\(K = 13.5\))</h2></header>
+  <header class="cab"><div class="kicker">8 · Estabilidad y caos</div><h2>Sensibilidad a las condiciones iniciales (\(K = 13.5\))</h2></header>
   <div class="fila">
     <div class="col a" style="--d:100">
       <div class="leyenda"><span><i style="background:var(--N)"></i>\(\mathbf{y}_0\)</span><span><i class="guion" style="color:var(--P); background:var(--P)"></i>\(\mathbf{y}_0 + (10^{-6}, 0, 0)\)</span></div>
       <div class="lienzo"><canvas id="ca-serie" data-w="600" data-h="330"></canvas><div class="tip"></div></div>
     </div>
     <div class="col a" style="--d:250">
-      <div class="leyenda"><span><i style="background:var(--euler)"></i>Separación \(\|\mathbf{y} - \tilde{\mathbf{y}}\|_\infty\)</span><span><i class="guion" style="color:var(--ink); background:var(--ink)"></i>\(e^{\lambda t}\), \(\lambda = 0.0092\)</span></div>
+      <div class="leyenda"><span><i style="background:var(--euler)"></i>Separación \(\|\mathbf{y} - \tilde{\mathbf{y}}\|_\infty\)</span><span><i class="guion" style="color:var(--ink); background:var(--ink)"></i>\(e^{\lambda t}\), \(\lambda = 0.0073\)</span></div>
       <div class="lienzo"><canvas id="ca-sep" data-w="560" data-h="330"></canvas><div class="tip"></div></div>
     </div>
   </div>
@@ -592,16 +592,16 @@ aside.notas { display: none; }
     </div>
     <table class="t a" style="--d:420; flex:0 0 560px; font-size:15px">
       <tr><th>\(K\)</th><td>10</td><td>11.5</td><td>12</td><td>12.25</td><td>13.5</td></tr>
-      <tr><th>\(\lambda_{\max}\)</th><td>−0.0383</td><td>+0.0001</td><td>−0.0001</td><td>+0.0056</td><td>+0.0092</td></tr>
-      <tr><th>Régimen</th><td>equilibrio</td><td>ciclo</td><td>período 2</td><td>caos</td><td>caos</td></tr>
+      <tr><th>\(\lambda_{\max}\)</th><td>−0.0383</td><td>+0.0001</td><td>−0.0001</td><td>+0.0059</td><td>+0.0073</td></tr>
+      <tr><th>Régimen</th><td>equilibrio</td><td>ciclo</td><td>período 2</td><td>irregular</td><td>irregular</td></tr>
     </table>
     <button class="b a" style="--d:480" id="ca-repetir">↻ Repetir</button>
   </div>
   <aside class="notas">
     <h4>Caos · 8:40 – 9:10</h4>
     <ul><li>Dos trayectorias que empiezan a 10⁻⁶ de distancia: idénticas hasta t ≈ 1900, después totalmente distintas.</li>
-    <li>La separación crece como \(e^{\lambda t}\) con λ = 0.0092 > 0 (método de Benettin). En el equilibrio adoptado λ = −0.0383 ≈ Re λ del Jacobiano.</li>
-    <li>Poincaré-Bendixson: con 2 especies el caos es imposible; el tercer nivel lo habilita.</li></ul>
+    <li>La referencia visual usa una pendiente estimada: \(e^{\lambda t}\) con λ estimado en una ventana finita (método de Benettin). En el equilibrio adoptado λ = −0.0383 ≈ Re λ del Jacobiano.</li>
+    <li>Poincaré-Bendixson restringe conjuntos límite compactos de EDO autónomas planas bajo sus hipótesis.</li></ul>
   </aside>
 </section>
 
@@ -610,13 +610,13 @@ aside.notas { display: none; }
   <header class="cab"><div class="kicker">9 · Cierre</div><h2>Conclusiones</h2></header>
   <div class="conclusiones">
     <div class="tarjeta a" style="--d:100"><h3>Métodos verificados</h3><div class="grande">orden 1.04 y 2.00</div><p>Euler y Heun implementados. Heun con una sola corrección logra orden 2 con 2 evaluaciones por paso.</p></div>
-    <div class="tarjeta a" style="--d:220"><h3>Paso justificado</h3><div class="grande">\(\Delta t = 0.05\)</div><p>Doble paso con RK2: \(D = 1.5\cdot10^{-4} < 10^{-3}\). Euler necesitaría ~14 veces más cálculo, y con pasos grandes inventa dinámicas (extinción espuria de \(S\)).</p></div>
+    <div class="tarjeta a" style="--d:220"><h3>Paso justificado</h3><div class="grande">\(\Delta t = 0.05\)</div><p>Doble paso con RK2: \(D = 1.5\cdot10^{-4} < 10^{-3}\). Euler con \(h=0.001\) también cumple \(D<10^{-3}\): 250 000 evaluaciones al resolver; RK2 usa 10 000.</p></div>
     <div class="tarjeta a" style="--d:340"><h3>Modelo calibrado</h3><div class="grande">\((5.105,\ 4.308,\ 1.878)\)</div><p>Los parámetros originales no permitían la coexistencia; la calibración, dentro de los rangos de la consigna, da un foco estable.</p></div>
-    <div class="tarjeta acento a" style="--d:460"><h3>Región segura</h3><div class="grande">\(K = 10 < K_H \approx 11.18\)</div><p>Por encima de \(K_H\): ciclo límite, duplicación de período y caos (\(\lambda > 0\)). El sistema opera fuera de la zona caótica.</p></div>
+    <div class="tarjeta acento a" style="--d:460"><h3>Región segura</h3><div class="grande">\(K = 10 < K_H \approx 11.18\)</div><p>La estabilidad mostrada es local y corresponde a los parámetros estudiados.</p></div>
   </div>
   <aside class="notas">
     <h4>Conclusiones · 9:10 – 9:40</h4>
-    <ul><li>Volver a las tres preguntas del inicio: coexistencia (sí, calibrada), método y Δt (RK2, 0.05, justificado), caos (mapeado y evitado).</li></ul>
+    <ul><li>Volver a las tres preguntas del inicio: coexistencia (sí, calibrada), método y Δt (RK2, 0.05, justificado), dinámica irregular (análisis complementario).</li></ul>
   </aside>
 </section>
 
@@ -676,7 +676,7 @@ aside.notas { display: none; }
           <li>Iterar <strong>no sube el orden</strong>: sigue siendo 2.</li>
           <li>Cada iteración cuesta <strong>una evaluación más</strong> de \(\mathbf{f}\).</li>
           <li>Con una corrección el método sigue siendo <strong>explícito</strong> y medimos orden <strong>2.00</strong>.</li>
-          <li>Todo el costo reportado cuenta exactamente 2 evaluaciones por paso.</li>
+          <li>Heun usa 2 evaluaciones por paso; Euler usa 1.</li>
         </ul>
       </div>
     </div>
@@ -700,7 +700,7 @@ aside.notas { display: none; }
         <tr><td>\((1.58,\ 5.85,\ 0)\)</td><td>−0.0137 ± 0.247i, <b>+0.0101</b></td><td>S invade</td></tr>
         <tr class="destacada"><td>\((5.10,\ 4.31,\ 1.88)\)</td><td>−0.1433, −0.0386 ± 0.1033i</td><td>foco estable</td></tr>
       </table>
-      <p class="mini" style="margin-top:8px">Todos los equilibrios de borde son invadibles: ninguna especie se extingue con la calibración adoptada.</p>
+      <p class="mini" style="margin-top:8px">La invasibilidad de los equilibrios de borde estudiados no demuestra persistencia global.</p>
     </div>
   </div>
   <aside class="notas"><h4>Respaldo: parámetros</h4><ul><li>Se tocaron solo K, m, q (sin rango) y b₁, b₃ (dentro de [0.1, 2]).</li></ul></aside>
@@ -731,13 +731,13 @@ aside.notas { display: none; }
   <header class="cab"><div class="kicker">Respaldo · Pregunta</div><h2>¿Por qué puede haber caos con tres especies y no con dos?</h2></header>
   <div class="fila">
     <div class="col">
-      <p><strong>Poincaré-Bendixson:</strong> en el plano \(\mathbb{R}^2\) las trayectorias no se cruzan; los conjuntos límite solo pueden ser puntos fijos o ciclos.</p>
+      <p><strong>Poincaré-Bendixson:</strong> para EDO autónomas planas, un conjunto límite compacto sin equilibrios es una órbita periódica bajo las hipótesis del teorema.</p>
       <p>Con el superdepredador el espacio de estados es \(\mathbb{R}^3\), lo que permite el estiramiento y plegado del flujo típico del caos determinista (Hastings y Powell, 1991).</p>
     </div>
     <div class="col">
       <div class="tarjeta acento">
         <p>La consigna asocia el caos a <strong>interacciones no locales y retardos</strong>.</p>
-        <p style="margin:0">Mostramos que el modelo local y sin retardo también llega al caos con solo <strong>enriquecer</strong> el ambiente (\(K\)). Lo confirma un exponente de Lyapunov positivo: \(\lambda = 0.0092\) en \(K = 13.5\).</p>
+        <p style="margin:0">El modelo local y sin retardo muestra dinámica irregular al <strong>enriquecer</strong> el ambiente (\(K\)). El exponente de Lyapunov estimado es positivo en una ventana finita; debe revisarse su sensibilidad al paso y al transitorio.</p>
       </div>
     </div>
   </div>
@@ -794,29 +794,32 @@ function campo(y, p) {
           p.f * fsn * S + p.g * fsp * S - p.q * S];
 }
 
-// Euler explícito: una evaluación de f por paso
+// Se rechazan valores inválidos: no se proyectan poblaciones negativas.
+function validarEstado(y) {
+  if (y.length !== 3 || y.some(v => !Number.isFinite(v) || v < 0))
+    throw new Error('Población negativa o no finita; reducir el paso');
+  return y;
+}
 function pasoEuler(y, dt, p) {
   const k = campo(y, p);
-  return [Math.max(y[0] + dt * k[0], 0), Math.max(y[1] + dt * k[1], 0), Math.max(y[2] + dt * k[2], 0)];
+  return validarEstado(y.map((v, i) => v + dt * k[i]));
 }
-
-// Heun (RK2): predictor + una única corrección, dos evaluaciones de f por paso
 function pasoRK2(y, dt, p) {
   const k1 = campo(y, p);
-  const yp = [Math.max(y[0] + dt * k1[0], 0), Math.max(y[1] + dt * k1[1], 0), Math.max(y[2] + dt * k1[2], 0)];
+  const yp = validarEstado(y.map((v, i) => v + dt * k1[i]));
   const k2 = campo(yp, p);
-  return [Math.max(y[0] + dt / 2 * (k1[0] + k2[0]), 0),
-          Math.max(y[1] + dt / 2 * (k1[1] + k2[1]), 0),
-          Math.max(y[2] + dt / 2 * (k1[2] + k2[2]), 0)];
+  return validarEstado(y.map((v, i) => v + dt / 2 * (k1[i] + k2[i])));
 }
-
 function integrar(paso, y0, tFinal, dt, p) {
+  if (!Number.isFinite(dt) || dt <= 0 || !Number.isFinite(tFinal) || tFinal < 0)
+    throw new Error('Paso o intervalo inválido');
+  validarEstado(y0);
   const n = Math.ceil(tFinal / dt) + 1;
   const t = new Float64Array(n), N = new Float64Array(n), P = new Float64Array(n), S = new Float64Array(n);
   let y = y0.slice();
   for (let i = 0; i < n; i++) {
-    t[i] = i * dt; N[i] = y[0]; P[i] = y[1]; S[i] = y[2];
-    if (i < n - 1) y = paso(y, dt, p);
+    t[i] = Math.min(i * dt, tFinal); N[i] = y[0]; P[i] = y[1]; S[i] = y[2];
+    if (i < n - 1) y = paso(y, Math.min(dt, tFinal - t[i]), p);
   }
   return { t, N, P, S, dt };
 }
@@ -1305,7 +1308,7 @@ modulos.explorador = (() => {
     const ms = performance.now() - t0, reg = clasificarRegimen(sol, 5000, { ...PARAMS, K });
     el.querySelector('#ex-badge').innerHTML = `<span aria-hidden="true">${ICONO[reg.tipo] || '○'}</span> ${reg.texto}`;
     el.querySelectorAll('[data-k]').forEach(b => b.classList.toggle('on', Math.abs(+b.dataset.k - K) < 1e-9));
-    el.querySelector('#ex-lectura').innerHTML = `K = ${K.toFixed(2)} ${K < 11.18 ? '< ' : '> '}K<sub>H</sub> = 11.18 · integración completa con RK2 (Δt = 0.05, ${sol.t.length.toLocaleString('es-AR')} pasos) en <b>${ms.toFixed(0)} ms</b>.`;
+    el.querySelector('#ex-lectura').innerHTML = `K = ${K.toFixed(2)} ${K < 11.18 ? '< ' : '> '}K<sub>H</sub> = 11.18 · integración completa con RK2 (Δt = 0.05, ${(sol.t.length - 1).toLocaleString('es-AR')} pasos) en <b>${ms.toFixed(0)} ms</b>.`;
     cancelar(); cancelar = animar(900, v => { u = suave(v); dibujar(); });
   }
   return {
@@ -1330,7 +1333,7 @@ modulos.caos = (() => {
   const sa = memo('caosA', () => integrar(pasoRK2, Y0, 3000, 0.05, pK));
   const sb = memo('caosB', () => integrar(pasoRK2, [Y0[0] + 1e-6, Y0[1], Y0[2]], 3000, 0.05, pK));
   const sep = memo('caosSep', () => { const d = new Float64Array(sa.t.length); for (let i = 0; i < d.length; i++) d[i] = Math.max(Math.abs(sa.N[i] - sb.N[i]), Math.abs(sa.P[i] - sb.P[i]), Math.abs(sa.S[i] - sb.S[i]), 1e-12); return d; });
-  const lam = 0.0092;
+  const lam = 0.0073;
   const ancla = memo('caosAncla', () => { let s = 0, n = 0; for (let i = 0; i < sa.t.length; i++) if (sa.t[i] > 300 && sa.t[i] < 500) { s += Math.log(sep[i]); n++; } return Math.exp(s / n); });
   function dibujar() {
     const i0 = Math.round(1500 / 0.05), i1 = Math.round(2500 / 0.05);

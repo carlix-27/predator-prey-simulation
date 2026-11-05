@@ -214,7 +214,7 @@ def figura_4_orden_convergencia(params):
     D_rk2 = np.array([diferencia_doble_paso(resolver_rk2, dt, params) for dt in pasos])
 
     print("\n  Tabla de doble paso  D(dt) = max_n ||y_dt - y_dt/2||_inf")
-    print(f"  {'dt':>7} | {'Euler':>11} | {'RK2':>11} | {'orden local Euler':>15} | {'RK2':>6}")
+    print(f"  {'dt':>7} | {'Euler':>11} | {'RK2':>11} | {'orden observado Euler':>15} | {'RK2':>6}")
     for i, (dt, de, dr) in enumerate(zip(pasos, D_euler, D_rk2)):
         if i + 1 < len(pasos):
             r = pasos[i] / pasos[i + 1]
@@ -278,9 +278,9 @@ def figura_5_bifurcacion_K(params, K_hopf):
     """
     Diagrama de bifurcación respecto de la capacidad de carga K: para cada K se
     descarta el transitorio y se grafican los máximos locales de N(t) y S(t).
-        1 punto   -> equilibrio estable (se grafica el valor de equilibrio)
-        p puntos  -> ciclo límite de período p
-        nube      -> régimen aperiódico (caótico)
+        Un máximo repetido puede corresponder a un ciclo; una nube indica
+        irregularidad y requiere otras pruebas para diagnosticar caos.
+        Si no se detectan máximos se grafica el último valor, no necesariamente un equilibrio.
     """
     valores_K = np.arange(9.0, 15.001, 0.025)
     t_transitorio, t_total = 2000.0, 3000.0
