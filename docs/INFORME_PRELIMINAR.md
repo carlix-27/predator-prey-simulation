@@ -274,17 +274,6 @@ Para el conjunto adoptado $K=10$, el equilibrio interior es localmente estable y
 * El barrido de $K$ sugiere cambios de estabilidad y comportamiento irregular; su clasificación asintótica requiere estudios adicionales de transitorios y refinamiento. Para $K=10$ se verifica estabilidad local del equilibrio estudiado.
 * El término cuadrático $c_i x^2$ de la respuesta funcional acota el consumo máximo en $\alpha/(\beta + 2\sqrt{\gamma})$. Este valor resulta ser la magnitud clave para decidir si cada nivel trófico puede persistir.
 
-## 6. Referencias
-
-1. Cátedra de Cálculo Numérico, Universidad Austral. *Problema 10*: consigna del modelo asignado.
-2. Cosner, C., DeAngelis, D. L., Ault, J. S., & Olson, D. B. (1999). Effects of spatial grouping on the functional response of predators. *Theoretical Population Biology*, 56(1), 65–75.
-2. Burden, R. L., & Faires, J. D. (2010). *Numerical Analysis* (9th ed.). Brooks/Cole.
-3. Strogatz, S. H. (2018). *Nonlinear Dynamics and Chaos: With Applications to Physics, Biology, Chemistry, and Engineering* (2nd ed.). CRC Press.
-4. Hastings, A., & Powell, T. (1991). Chaos in a three-species food chain. *Ecology*, 72(3), 896–903.
-5. Rosenzweig, M. L. (1971). Paradox of enrichment: destabilization of exploitation ecosystems in ecological time. *Science*, 171(3969), 385–387.
-6. Benettin, G., Galgani, L., Giorgilli, A., & Strelcyn, J.-M. (1980). Lyapunov characteristic exponents for smooth dynamical systems and for Hamiltonian systems; a method for computing all of them. *Meccanica*, 15, 9–30.
-7. Chapra, S. C., & Canale, R. P. (2015). *Numerical Methods for Engineers* (7th ed.). McGraw-Hill Education.
-
 ## Anexo A: Código Fuente
 
 | Archivo | Función | Sección del informe |
