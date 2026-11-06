@@ -30,7 +30,7 @@ Esta guía organiza los 10 minutos de exposición grupal y prepara las respuesta
   * **RK2 (Heun):** Orden 2. Error local $\mathcal{O}(\Delta t^3)$, global $\mathcal{O}(\Delta t^2)$. Predictor-corrector que promedia pendientes.
 * **Justificación del paso $dt$ (¡Pregunta fija de examen!):**
   * *¿Por qué no usar un $dt$ grande?* Porque el Jacobiano del sistema tiene autovalores propios del acoplamiento. Si $\Delta t$ supera el límite de estabilidad de Dahlquist, el método genera amplificación numérica artificial (análogo al oscilador armónico que gana energía espuria con Euler).
-  * *Criterio adoptado:* Doble paso, $D(\Delta t) = \max_n \|\mathbf{y}_{\Delta t} - \mathbf{y}_{\Delta t/2}\|_\infty < 10^{-3}$. Con RK2 y $\Delta t = 0.05$ se obtiene $D = 1.5\times10^{-4}$ con 5000 pasos. Euler no cumple la tolerancia ni con $\Delta t = 0.01$ ($D = 5.5\times10^{-3}$) y necesitaría unas 14 veces más evaluaciones.
+  * *Criterio adoptado:* Doble paso, $D(\Delta t) = \max_n \|\mathbf{y}_{\Delta t} - \mathbf{y}_{\Delta t/2}\|_\infty < 10^{-3}$. Con RK2 y $\Delta t = 0.05$ se obtiene $D = 1.5\times10^{-4}$ con 5000 pasos. Euler con $h=0.001$ da $D=5.4532\times10^{-4}$ y requiere 250 000 evaluaciones para resolver; validar añade 500 000. Para RK2 las cifras son 10 000 y 20 000.
   * *Órdenes verificados:* pendientes log-log de 1.04 (Euler) y 2.00 (RK2), es decir, al dividir $\Delta t$ por 2 el error baja a la mitad o a la cuarta parte.
 
 ---
@@ -38,8 +38,8 @@ Esta guía organiza los 10 minutos de exposición grupal y prepara las respuesta
 ### Minutos 5 a 8: Resultados Gráficos y Evitación del Caos
 * **Mostrar Figura 1 (Evolución temporal):** Destacar que tras el transitorio oscilatorio (período ≈ 61) las tres poblaciones convergen a la coexistencia $(N^*, P^*, S^*) = (5.105,\ 4.308,\ 1.878)$, un foco estable con autovalores $-0.1433$ y $-0.0386 \pm 0.1033i$.
 * **Mostrar Figura 2 (Espacio de fases 3D):** Explicar la trayectoria en espiral hacia el atractor de punto fijo.
-* **Mostrar Figura 3 (Euler vs. RK2):** Con $\Delta t = 2$, Euler amplifica las oscilaciones y extingue numéricamente al superdepredador, mientras que RK2 sigue la referencia.
-* **El tema del Caos (Figuras 5 y 6):** Al aumentar la capacidad de carga $K$ (enriquecimiento), el equilibrio pierde estabilidad en una bifurcación de Hopf ($K_H \approx 11.18$). Después vienen la duplicación de período y el caos, con exponente de Lyapunov positivo ($+0.0092$ en $K = 13.5$), y para $K \gtrsim 14$ el superdepredador colapsa. El valor adoptado $K = 10$ está en la zona estable.
+* **Mostrar Figura 3 (Euler vs. RK2):** Con $\Delta t = 2$, Euler amplifica las oscilaciones y reduce mucho la densidad del superdepredador ($S(250) \approx 0.0091$); eso no demuestra extinción. RK2 sigue la referencia.
+* **Análisis complementario:** el cruce de autovalores cerca de $K=11.18$ sugiere Hopf, pero no prueba la estabilidad de un ciclo. Una nube de máximos indica irregularidad; requiere comprobar transitorios y refinamientos antes de afirmar caos.
 
 > **Ojo:** la parametrización original ($K = 100$, $m = 0.2$, $q = 0.1$, $b_1 = b_3 = 0.5$) extinguía a $P$ y $S$, porque $b \cdot \max F_{PN} = 0.107 < m = 0.2$. Ver la Sección 2.4 del informe.
 
@@ -62,7 +62,7 @@ Esta guía organiza los 10 minutos de exposición grupal y prepara las respuesta
 > **Respuesta:** "Porque con $m = 0.2$ el depredador no puede compensar su mortalidad: el máximo de $b\,F_{PN}$ es $0.5 \cdot 0.15/(0.5 + 2\sqrt{0.01}) = 0.107 < 0.2$, y el sistema converge a $(90, 0, 0)$. Ajustamos $b_1$, $b_3$ (dentro de rango), $m$, $q$ y $K$ (sin rango en la consigna). Con $K = 100$ el equilibrio de coexistencia sería inestable por la paradoja del enriquecimiento; el umbral es $K_H \approx 11.18$."
 
 ### P2c: "¿Por qué no iteran el corrector de Heun hasta que converja?"
-> **Respuesta:** "Porque no hace falta. Hacemos un paso con una sola corrección: predictor de Euler, $\mathbf{k}_2$ en el punto predicho y $\mathbf{y}_{n+1} = \mathbf{y}_n + \frac{\Delta t}{2}(\mathbf{k}_1 + \mathbf{k}_2)$. Si iteráramos el corrector, la iteración de punto fijo convergería a la regla del trapecio implícita, que también es de orden 2. Iterar no sube el orden, solo agrega una evaluación de $\mathbf{f}$ por iteración. Con una corrección ya obtenemos orden 2 (medimos 2.00) con dos evaluaciones por paso y el método sigue siendo explícito."
+> **Respuesta:** "Porque no hace falta. Hacemos un paso con una sola corrección: predictor de Euler, $\mathbf{k}_2$ en el punto predicho y $\mathbf{y}_{n+1} = \mathbf{y}_n + \frac{\Delta t}{2}(\mathbf{k}_1 + \mathbf{k}_2)$. Si iteráramos el corrector, la iteración de punto fijo convergería a la regla del trapecio implícita, que también es de orden 2. Iterar no sube el orden, pero modifica el costo y puede modificar la estabilidad. Con una corrección ya obtenemos orden 2 (medimos 2.00) con dos evaluaciones por paso y el método sigue siendo explícito."
 
 ### P3: "¿Por qué en este modelo tritrófico puede haber caos mientras que en Lotka-Volterra clásico de 2 especies no?"
-> **Respuesta:** "Por el Teorema de Poincaré-Bendixson: en el plano bidimensional continuo ($\mathbb{R}^2$), las trayectorias no pueden cruzarse y los únicos conjuntos límite posibles son puntos fijos o ciclos límites periódicos. Al agregar un tercer nivel trófico (superdepredador), el espacio de estados pasa a ser tridimensional ($\mathbb{R}^3$), lo cual permite el estiramiento y plegado del espacio de fases característico del caos determinista."
+> **Respuesta:** "Por el Teorema de Poincaré-Bendixson: para EDO autónomas planas, bajo las hipótesis del teorema, un conjunto límite compacto sin equilibrios es una órbita periódica. Al agregar un tercer nivel trófico (superdepredador), el espacio de estados pasa a ser tridimensional ($\mathbb{R}^3$), lo cual permite el estiramiento y plegado del espacio de fases característico del caos determinista."

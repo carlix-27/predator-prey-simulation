@@ -6,7 +6,7 @@ Propósito: Generar el informe final a partir de INFORME_PRELIMINAR.md
 ===============================================================================
 Descripción:
     1. Reescribe el Anexo A del Markdown con el contenido actual de los scripts
-       (euler_cosner.py, rk2_cosner.py, generar_figuras.py).
+       (euler_cosner.py y rk2_cosner.py).
     2. Genera INFORME_EDITABLE.docx: ecuaciones nativas de Word (editables y
        compatibles con Google Docs), figuras embebidas y código como anexo.
     3. Genera INFORME_EDITABLE.html autocontenido (MathML, imágenes embebidas,
@@ -41,7 +41,6 @@ SALIDA_PDF = DOCS / 'INFORME.pdf'
 ANEXO = [
     ('A.1', 'euler_cosner.py', 'Método de Euler explícito'),
     ('A.2', 'rk2_cosner.py', 'Método de Runge-Kutta 2 (Heun)'),
-    ('A.3', 'generar_figuras.py', 'Análisis, figuras y tablas del informe'),
 ]
 MARCA_INICIO = '<!-- ANEXO:INICIO'
 MARCA_FIN = '<!-- ANEXO:FIN -->'
@@ -50,15 +49,14 @@ TITULO_ANEXO = '## Anexo A: Código Fuente'
 SALTO_DE_PAGINA_WORD = '```{=openxml}\n<w:p><w:r><w:br w:type="page"/></w:r></w:p>\n```\n\n'
 
 ESTILO_HTML = """
-body { font-family: Georgia, 'Times New Roman', serif; line-height: 1.55; color: #222;
+body { font-family: Georgia, 'Times New Roman', serif; line-height: 1.42; color: #222;
        max-width: 820px; margin: 2em auto; padding: 0 1.2em; background: #fff; }
-header, header p { text-align: center; margin-bottom: 2em; }
-h1.title { font-family: Arial, sans-serif; font-size: 1.6em; margin-bottom: .3em; }
+header, header p { text-align: left; margin-bottom: .7em; }
+h1.title { font-family: Georgia, serif; font-size: 1.6em; margin-bottom: .3em; }
 p.subtitle { font-family: Arial, sans-serif; font-size: 1.1em; color: #444; margin: 0; }
 p.author, p.date { font-family: Arial, sans-serif; color: #555; margin: .25em 0; }
-h2 { font-family: Arial, sans-serif; color: #1a365d; border-bottom: 1px solid #cbd5e0;
-     padding-bottom: .2em; margin-top: 1.8em; }
-h3 { font-family: Arial, sans-serif; color: #2b6cb0; margin-top: 1.3em; }
+h2 { font-family: Georgia, serif; color: #222; margin-top: 1.4em; }
+h3 { font-family: Georgia, serif; color: #222; margin-top: 1.1em; }
 h2, h3 { break-after: avoid; page-break-after: avoid; }
 p, li { text-align: justify; }
 figure { margin: 1.2em 0; text-align: center; break-inside: avoid; }
@@ -67,13 +65,13 @@ figcaption { font-family: Arial, sans-serif; font-size: .88em; color: #333; font
              margin-top: .4em; }
 table { border-collapse: collapse; margin: 1em auto; font-family: Arial, sans-serif; font-size: .9em; }
 th, td { border: 1px solid #cbd5e1; padding: .35em .7em; }
-th { background: #f1f5f9; }
+th { background: #303943; color: white; }
 math[display="block"] { margin: .8em 0; }
 pre, code { font-family: Consolas, 'Courier New', monospace; }
 pre { font-size: .72em; background: #f5f7fa; border: 1px solid #e2e8f0; padding: .8em;
       white-space: pre-wrap; word-break: break-word; }
 h2[id^="anexo"] { break-before: page; }
-@page { size: letter; margin: 2.2cm; }
+@page { size: letter; margin: 2.2cm; @bottom-left { content: 'Modelo tritrófico de Cosner'; font-size: 8pt; color: #555; } @bottom-right { content: 'Página ' counter(page); font-size: 8pt; color: #555; } }
 @media print { body { margin: 0; max-width: none; } }
 """
 

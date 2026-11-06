@@ -37,11 +37,20 @@ Simulación numérica y análisis de estabilidad del modelo ecológico de tres n
 
 ### Ejecución
 ```bash
-pip install -r requirements.txt
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+
+# Pruebas (Node.js debe estar disponible en el PATH)
+python -m unittest discover -s tests -v
+node tests/test_explorador.js
 
 # Integración individual con cada método
 python docs/euler_cosner.py
 python docs/rk2_cosner.py
+
+# Lyapunov: sensibilidad al paso y a las ventanas
+python docs/validar_lyapunov.py
 
 # Figuras y resultados del informe (~5 min por el diagrama de bifurcación)
 python docs/generar_figuras.py

@@ -8,13 +8,13 @@ Este compendio de fuentes proporciona el sustento teórico y matemático necesar
 
 1. **Cosner, C., DeAngelis, D. L., Ault, J. S., & Olson, D. B. (1999).**
    * *Effects of spatial grouping on the functional response of predators.* Theoretical Population Biology, 56(1), 65–75.
-   * **Relevancia:** Origen y justificación biológica de las respuestas funcionales racionales del tipo $\frac{a N}{1 + b N + c N^2}$. Explica la no-monotonía (inhibición por alta densidad, formación de cardúmenes o defensa grupal) frente a las funciones de Holling Tipo II y III estándar.
+   * **Relevancia:** Estudia el efecto de la agrupación espacial en respuestas funcionales; no se atribuye a este artículo la fórmula específica asignada. La fuente directa de las ecuaciones es la consigna Problema 10. Explica la no-monotonía (inhibición por alta densidad, formación de cardúmenes o defensa grupal) frente a las funciones de Holling Tipo II y III estándar.
    * **Concepto clave para la defensa:** ¿Por qué el término cuadrático $c N^2$ en el denominador? Porque a densidades extremadamente altas de presa, se produce interferencia o defensa colectiva (efecto *group defense* o confusión del depredador), reduciendo la tasa de captura per cápita.
 
 2. **Hastings, A., & Powell, T. (1991).**
    * *Chaos in a Three-Species Food Chain.* Ecology, 72(3), 896–903.
    * **Relevancia:** Paper seminal que demuestra que los sistemas depredador-presa de 3 niveles tróficos (presa, depredador, superdepredador) exhiben bifurcaciones hacia el caos mediante cascadas de duplicación de período (atractor de Hastings-Powell).
-   * **Concepto clave para la defensa:** Explica por qué en 2 especies (teorema de Poincaré-Bendixson) el caos en tiempo continuo es imposible, pero en 3 especies (dimensión $\ge 3$) la dinámica caótica emerge de forma natural si los parámetros de ataque no están acotados.
+   * **Concepto clave para la defensa:** El teorema de Poincaré-Bendixson restringe los conjuntos límite de EDO autónomas planas bajo sus hipótesis. La dimensión tres permite, pero no garantiza, dinámica caótica.
 
 3. **Murray, J. D. (2002).**
    * *Mathematical Biology I: An Introduction* (3rd ed.). Springer-Verlag.
@@ -55,11 +55,11 @@ Este compendio de fuentes proporciona el sustento teórico y matemático necesar
 
 ### ¿Cómo evitar el caos?
 * El informe de la consigna señala: *"Aparecen oscilaciones caóticas al combinarse con interacciones no locales y un retraso de mayor duración. Un alcance elevado de las interacciones no locales conduce al caos."*
-* Para garantizar un estado asintótico de equilibrio:
+* Para estudiar la estabilidad local del equilibrio:
   1. Mantener las tasas de ataque $a, c, e$ dentro de rangos moderados (ej. $0.05 - 0.20$).
   2. Ajustar los coeficientes de saturación $b_i$ y $c_i$ para que no ocurran saltos abruptos en el consumo.
   3. Asegurar que las tasas de mortalidad $m, q$ estén equilibradas con la eficiencia de conversión $b, f, g$, logrando que todos los autovalores del Jacobiano en el punto de coexistencia tengan parte real negativa ($\text{Re}(\lambda_i) < 0$).
-  4. Mantener la capacidad de carga $K$ por debajo del umbral de Hopf. Con los parámetros adoptados, $K_H \approx 11.18$; para $K$ mayor aparecen ciclos límite, duplicación de período y caos (*paradoja del enriquecimiento*, Rosenzweig 1971). El informe usa $K = 10$ (Sección 4.5).
+  4. Examinar la existencia y estabilidad local del equilibrio para cada capacidad de carga $K$. Con los parámetros adoptados, $K_H \approx 11.18$; para $K$ mayor aparecen ciclos límite, duplicación de período y caos (*paradoja del enriquecimiento*, Rosenzweig 1971). El informe usa $K = 10$ (Sección 4.5).
 
 5. **Rosenzweig, M. L. (1971).** *Paradox of enrichment: destabilization of exploitation ecosystems in ecological time.* Science, 171(3969), 385–387.
    * **Relevancia:** Aumentar la capacidad de carga de la presa desestabiliza el equilibrio presa-depredador. Es el mecanismo que se observa en el diagrama de bifurcación del informe (Figura 5).
