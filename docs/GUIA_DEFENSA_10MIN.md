@@ -38,7 +38,7 @@ Esta guía organiza los 10 minutos de exposición grupal y prepara las respuesta
 ### Minutos 5 a 8: Resultados Gráficos y Evitación del Caos
 * **Mostrar Figura 1 (Evolución temporal):** Destacar que tras el transitorio oscilatorio (período ≈ 61) las tres poblaciones convergen a la coexistencia $(N^*, P^*, S^*) = (5.105,\ 4.308,\ 1.878)$, un foco estable con autovalores $-0.1433$ y $-0.0386 \pm 0.1033i$.
 * **Mostrar Figura 2 (Espacio de fases 3D):** Explicar la trayectoria en espiral hacia el atractor de punto fijo.
-* **Mostrar Figura 3 (Euler vs. RK2):** Con $\Delta t = 2$, Euler amplifica las oscilaciones y extingue numéricamente al superdepredador, mientras que RK2 sigue la referencia.
+* **Mostrar Figura 3 (Euler vs. RK2):** Con $\Delta t = 2$, Euler amplifica las oscilaciones y reduce mucho la densidad del superdepredador ($S(250) \approx 0.0091$); eso no demuestra extinción. RK2 sigue la referencia.
 * **Análisis complementario:** el cruce de autovalores cerca de $K=11.18$ sugiere Hopf, pero no prueba la estabilidad de un ciclo. Una nube de máximos indica irregularidad; requiere comprobar transitorios y refinamientos antes de afirmar caos.
 
 > **Ojo:** la parametrización original ($K = 100$, $m = 0.2$, $q = 0.1$, $b_1 = b_3 = 0.5$) extinguía a $P$ y $S$, porque $b \cdot \max F_{PN} = 0.107 < m = 0.2$. Ver la Sección 2.4 del informe.

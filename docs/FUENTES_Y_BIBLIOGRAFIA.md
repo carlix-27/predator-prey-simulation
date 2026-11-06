@@ -14,7 +14,7 @@ Este compendio de fuentes proporciona el sustento teórico y matemático necesar
 2. **Hastings, A., & Powell, T. (1991).**
    * *Chaos in a Three-Species Food Chain.* Ecology, 72(3), 896–903.
    * **Relevancia:** Paper seminal que demuestra que los sistemas depredador-presa de 3 niveles tróficos (presa, depredador, superdepredador) exhiben bifurcaciones hacia el caos mediante cascadas de duplicación de período (atractor de Hastings-Powell).
-   * **Concepto clave para la defensa:** Explica por qué en 2 especies (teorema de Poincaré-Bendixson) el caos en tiempo continuo es imposible, pero en 3 especies (dimensión $\ge 3$) la dinámica caótica emerge de forma natural si los parámetros de ataque no están acotados.
+   * **Concepto clave para la defensa:** El teorema de Poincaré-Bendixson restringe los conjuntos límite de EDO autónomas planas bajo sus hipótesis. La dimensión tres permite, pero no garantiza, dinámica caótica.
 
 3. **Murray, J. D. (2002).**
    * *Mathematical Biology I: An Introduction* (3rd ed.). Springer-Verlag.

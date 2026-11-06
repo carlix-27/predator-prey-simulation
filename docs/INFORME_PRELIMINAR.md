@@ -139,19 +139,7 @@ $$
 * **Error de truncamiento local:** $\mathcal{O}(\Delta t^3)$.
 * **Error global:** $\mathcal{O}(\Delta t^2)$, con dos evaluaciones de $\mathbf{f}$ por paso.
 
-**Un paso, una sola corrección.** En la implementación, cada paso temporal aplica el predictor una vez y el corrector una única vez. No se itera el corrector. En la variante iterativa del método de Heun (Chapra & Canale), el corrector se repite y recalcula la pendiente final con el valor ya corregido:
-
-$$
-\mathbf{y}_{n+1}^{(j+1)} = \mathbf{y}_n + \frac{\Delta t}{2}\left[\mathbf{f}(t_n, \mathbf{y}_n) + \mathbf{f}\big(t_{n+1}, \mathbf{y}_{n+1}^{(j)}\big)\right], \qquad j = 0, 1, 2, \dots
-$$
-
-Si $\frac{\Delta t}{2}\|J\| < 1$, esta iteración de punto fijo converge a la regla del trapecio implícita:
-
-$$
-\mathbf{y}_{n+1} = \mathbf{y}_n + \frac{\Delta t}{2}\left[\mathbf{f}(t_n, \mathbf{y}_n) + \mathbf{f}(t_{n+1}, \mathbf{y}_{n+1})\right]
-$$
-
-La regla del trapecio también tiene error global $\mathcal{O}(\Delta t^2)$. Iterar el corrector no aumenta el orden, pero cambia la aproximación, el costo y puede cambiar sus propiedades de estabilidad. Con una única corrección ($j = 0$) el esquema ya alcanza el orden 2 con dos evaluaciones por paso, y sigue siendo explícito. El orden observado de 2.00 de la Sección 4.4 es coherente con ello. Euler usa una evaluación por paso.
+Se utiliza una sola corrección de Heun: el método es explícito y requiere dos evaluaciones del campo por paso. No es el RK2 del punto medio, que evalúa su segunda pendiente en el punto medio. Iterar el corrector puede modificar la estabilidad y el costo, aunque no eleve el orden de la regla del trapecio resultante.
 
 ### 3.3. Estabilidad absoluta
 
@@ -173,20 +161,11 @@ $$
 
 Para un método de orden $p$ se cumple $D(\Delta t) \approx C\,(1 - 2^{-p})\,\Delta t^p$. La pendiente de $\log D$ contra $\log \Delta t$ estima entonces el orden observado, y el paso se considera validado cuando $D(\Delta t) < 10^{-3}$.
 
-### 3.5. Herramientas de análisis complementarias
+### 3.5. Análisis complementario
 
-* **Jacobiano:** diferencias centradas, $J_{:,j} \approx [\mathbf{f}(\mathbf{y} + h\mathbf{e}_j) - \mathbf{f}(\mathbf{y} - h\mathbf{e}_j)]/(2h)$ con $h = 10^{-6}$.
-* **Equilibrios:** Newton-Raphson, $J(\mathbf{y}_k)\,\boldsymbol{\delta} = -\mathbf{f}(\mathbf{y}_k)$, a partir del estado final de la simulación.
-* **Bifurcación de Hopf:** bisección sobre $K$ del valor $\max_i \operatorname{Re}\lambda_i(J(\mathbf{y}^*))$ hasta hallar su cruce por cero.
-* **Exponente de Lyapunov máximo (Benettin):** se integran con RK2 dos trayectorias separadas $d_0 = 10^{-8}$, se acumula $\ln(d_k/d_0)$ cada $\tau = 2$ unidades de tiempo y se renormaliza la separación:
+El equilibrio se aproxima con Newton y el Jacobiano con diferencias centradas. Para estudiar la sensibilidad a $K$ se localiza el cruce de autovalores y se estima el exponente máximo de Lyapunov mediante dos trayectorias cercanas, renormalizadas cada dos unidades de tiempo. Las estimaciones de tiempo finito dependen del paso y de la ventana utilizada.
 
-$$
-\lambda_{\max} \approx \frac{1}{n\tau} \sum_{k=1}^{n} \ln\frac{d_k}{d_0}
-$$
-
-Un exponente positivo estimado indica separación exponencial local durante el período medido; valores próximos a cero o negativos no identifican por sí solos el régimen. Deben analizarse transitorios, paso y tiempo de promedio.
-
-## 4. Resultados y Discusión
+## 4. Resultados
 
 Todas las figuras y valores numéricos de esta sección se obtienen ejecutando `generar_figuras.py` (Anexo A.3), que reutiliza los integradores de `euler_cosner.py` y `rk2_cosner.py`.
 
@@ -215,7 +194,7 @@ La trayectoria describe una espiral que se cierra sobre el equilibrio interior. 
 Con los autovalores de la Sección 2.4, el paso máximo linealmente estable en el equilibrio es $\Delta t_{\max} = 6.35$ para Euler (limitado por el par complejo) y $13.96$ para RK2 (limitado por el autovalor real). Aun así, la Figura 3 muestra diferencias marcadas entre ambos métodos:
 
 * **Euler con $\Delta t = 0.5$** reproduce el equilibrio final, pero con errores visibles de amplitud y fase durante el transitorio.
-* **Euler con $\Delta t = 2$** produce un resultado cualitativamente falso: las oscilaciones de $P$ crecen en lugar de amortiguarse y el superdepredador se extingue numéricamente. El paso $\Delta t = 2$ es linealmente estable en el equilibrio interior ($2 < 6.35$), pero en el borde $N$–$P$, por donde pasa el transitorio, los modos oscilatorios tienen $|1 + \lambda\Delta t| = 1.091 > 1$. Euler los amplifica un 9% por paso y la trayectoria discreta queda atrapada en una oscilación espuria. La estabilidad lineal en $\mathbf{y}^*$ es necesaria pero no suficiente; por eso hace falta además un criterio de precisión.
+* **Euler con $\Delta t = 2$** produce un resultado cualitativamente falso: las oscilaciones de $P$ crecen en lugar de amortiguarse y el superdepredador alcanza una densidad numérica muy baja ($S(250) \approx 0.0091$); este resultado a tiempo finito no demuestra extinción. El paso $\Delta t = 2$ es linealmente estable en el equilibrio interior ($2 < 6.35$), pero en el borde $N$–$P$, por donde pasa el transitorio, los modos oscilatorios tienen $|1 + \lambda\Delta t| = 1.091 > 1$. Euler los amplifica un 9% por paso y la trayectoria discreta queda atrapada en una oscilación espuria. La estabilidad lineal en $\mathbf{y}^*$ es necesaria pero no suficiente; por eso hace falta además un criterio de precisión.
 * **RK2** se mantiene prácticamente superpuesto a la referencia con los tres pasos, incluso con $\Delta t = 2$.
 
 ### 4.4. Selección y justificación del paso $\Delta t$
@@ -240,56 +219,35 @@ La tolerancia $10^{-3}$ se aplica a la discrepancia $D$, no al error. En régime
 * **Paso adoptado:** RK2 satisface la tolerancia $10^{-3}$ desde $\Delta t = 0.1$. Se adopta $\Delta t = 0.05$, que deja un margen de casi 7 veces ($D = 1.5\times10^{-4}$) con 5000 pasos, es decir, $10^4$ evaluaciones de $\mathbf{f}$.
 * **Costo comparado:** Para el criterio común $D<10^{-3}$, Euler con $h=0.001$ da $D=5.4532\times10^{-4}$ y requiere 250 000 evaluaciones para resolver; RK2 con $h=0.05$ da $D=1.4982\times10^{-4}$ y requiere 10 000. Validar requiere además resolver la malla refinada: 500 000 y 20 000 evaluaciones adicionales, respectivamente. Ambos cumplen la misma tolerancia, aunque sus discrepancias no son iguales. Euler con $h=0.0005$ da $D=2.7253\times10^{-4}$.
 
-### 4.5. Zonas de inestabilidad: bifurcación de Hopf y caos
+### 4.5. Análisis complementario al variar $K$
 
-La parametrización elegida debe quedar lejos de la región caótica. Para delimitarla se varía la capacidad de carga $K$, que es el parámetro que controla el enriquecimiento del sistema, manteniendo fijos todos los demás.
+Se varió $K$ entre 9 y 15 manteniendo los demás parámetros. El cruce de un par de autovalores cerca de $K=11.18$ aporta evidencia de una bifurcación de Hopf, pero no prueba que nazca un ciclo estable.
 
-![Diagrama de bifurcación](figuras/fig5_bifurcacion_K.png)
+![Diagrama de máximos](figuras/fig5_bifurcacion_K.png)
 
-*__Figura 5.__ Diagrama de bifurcación respecto de $K$: máximos locales de $N(t)$ y $S(t)$ tras descartar el transitorio ($t > 2000$). Un único máximo repetido puede corresponder a un ciclo simple; un equilibrio requiere amplitud tendiente a cero y residuo del campo pequeño. Varios máximos requieren estudiar su repetición y los transitorios; una nube sugiere irregularidad y requiere comprobaciones adicionales para hablar de caos.*
+*__Figura 5.__ Máximos locales de $N$ y $S$ tras descartar $t \le 2000$. Un máximo repetido puede corresponder a un ciclo simple; para un equilibrio se requieren amplitud que tienda a cero y residuo del campo pequeño. Una nube indica irregularidad, no demuestra caos.*
 
-| $K$ | $\lambda_{\max}$ (Lyapunov) | Régimen |
-| :---: | :---: | :--- |
-| $10$ (adoptado) | $-0.0383$ | Equilibrio estable ($\approx \operatorname{Re}\lambda_{2,3} = -0.0386$) |
-| $11.5$ | $+0.0001$ | Ciclo límite (período 1) |
-| $12$ | $-0.0001$ | Ciclo límite (período 2) |
-| $12.25$ | $+0.0059$ | Irregularidad observada |
-| $13.5$ | $+0.0073$ | Comportamiento irregular; estimación de tiempo finito |
+Para $K=13.5$, las estimaciones del exponente máximo de Lyapunov con pasos $0.05$, $0.025$ y $0.0125$ son 0.00731, 0.00819 y 0.00799 para un transitorio de 2000 y promedio de 4000. Al duplicar ambas ventanas se obtienen 0.00833, 0.00831 y 0.00938. El signo positivo persiste, pero la variación impide afirmar convergencia a cuatro decimales y no constituye una prueba rigurosa de caos. No se exige coincidencia punto a punto de trayectorias a tiempos largos.
 
-El cruce de un par de autovalores cerca de $K=11.18$ aporta evidencia de una bifurcación de Hopf; no demuestra por sí solo que aparezca un ciclo estable. Los máximos sugieren cambios de régimen, pero deben comprobarse la duración del transitorio y la repetición. La nomenclatura período $p$ indica $p$ máximos distintos que se repiten en una órbita; no se infiere un equilibrio a partir de un único máximo.
+## 5. Discusión
 
-![Régimen irregular](figuras/fig6_regimen_caotico.png)
+Los resultados del caso base son compatibles con la estabilidad local del equilibrio interior y muestran una trayectoria amortiguada para las condiciones iniciales estudiadas. Esta observación no demuestra estabilidad global: la invasibilidad de los equilibrios de borde examinados no alcanza para garantizar la persistencia de todas las especies.
 
-*__Figura 6.__ Comportamiento observado para $K=13.5$ y sensibilidad a condiciones iniciales. Las trayectorias a tiempos largos no deben compararse punto a punto para validar un régimen caótico. La pendiente indicada es una estimación de tiempo finito, sensible al paso y a la ventana de integración.*
+El refinamiento muestra que la precisión depende del método y del paso. La tolerancia adoptada controla la discrepancia entre mallas y las estimaciones de error dependen de que se haya alcanzado el régimen asintótico. La estabilidad lineal cerca del equilibrio tampoco garantiza que un paso grande represente correctamente el transitorio.
 
-Para $K=13.5$ se recalculó el exponente máximo mediante dos trayectorias renormalizadas. Con transitorio 2000 y promedio 4000, para $h=0.05$, $0.025$ y $0.0125$ se obtienen respectivamente 0.00731, 0.00819 y 0.00799; con transitorio 4000 y promedio 8000 se obtienen 0.00833, 0.00831 y 0.00938. El signo positivo persiste, pero la variación muestra que las cifras no están convergidas a cuatro decimales. Son estimaciones de tiempo finito, no una prueba rigurosa de caos.
+El barrido de $K$ y las estimaciones de Lyapunov constituyen un análisis complementario. Sus resultados dependen del tiempo de observación y del paso; una nube de máximos o una estimación positiva de tiempo finito no constituye una demostración rigurosa de caos. Los parámetros son hipotéticos y el modelo no se ha contrastado con observaciones ecológicas.
 
-Para el conjunto adoptado $K=10$, el equilibrio interior es localmente estable y la trayectoria estudiada se aproxima a él. No se deduce de ello estabilidad global ni estabilidad para todo $K<K_H$. El teorema de Poincaré–Bendixson se aplica a EDO autónomas planas bajo sus hipótesis, no a cualquier sistema bidimensional.
-
-## 5. Conclusiones
+## 6. Conclusiones
 
 * Se implementaron los métodos de Euler explícito y RK2 (Heun) en códigos modulares para el modelo tritrófico, y se verificaron empíricamente sus órdenes de convergencia: 1.04 y 2.00.
-* El paso $\Delta t = 0.05$ con RK2 queda justificado por el criterio de doble paso ($D = 1.5\times10^{-4} < 10^{-3}$). Para $D<10^{-3}$, los pasos probados de Euler y RK2 requieren respectivamente 250 000 y 10 000 evaluaciones para resolver; la validación agrega las mallas refinadas. Con pasos grandes ($\Delta t = 2$), Euler produce dinámicas espurias, como la extinción numérica del superdepredador, aunque el paso sea linealmente estable en el equilibrio.
-* La parametrización original no permitía la coexistencia porque la tasa máxima de consumo del depredador no compensaba su mortalidad. Se calibró un conjunto de parámetros dentro de los rangos de la consigna que garantiza un equilibrio de coexistencia asintóticamente estable, con todos los equilibrios de borde invadibles.
+* El paso $\Delta t = 0.05$ con RK2 queda justificado por el criterio de doble paso ($D = 1.5\times10^{-4} < 10^{-3}$). Para $D<10^{-3}$, los pasos probados de Euler y RK2 requieren respectivamente 250 000 y 10 000 evaluaciones para resolver; la validación agrega las mallas refinadas. Con pasos grandes ($\Delta t = 2$), Euler produce dinámicas espurias, como la caída espuria de la densidad del superdepredador, aunque el paso sea linealmente estable en el equilibrio.
+* La parametrización original no permitía la coexistencia porque la tasa máxima de consumo del depredador no compensaba su mortalidad. Se calibró un conjunto de parámetros dentro de los rangos de la consigna con un equilibrio de coexistencia localmente asintóticamente estable y equilibrios de borde estudiados invadibles.
 * El barrido de $K$ sugiere cambios de estabilidad y comportamiento irregular; su clasificación asintótica requiere estudios adicionales de transitorios y refinamiento. Para $K=10$ se verifica estabilidad local del equilibrio estudiado.
 * El término cuadrático $c_i x^2$ de la respuesta funcional acota el consumo máximo en $\alpha/(\beta + 2\sqrt{\gamma})$. Este valor resulta ser la magnitud clave para decidir si cada nivel trófico puede persistir.
 
 ## Anexo A: Código Fuente
 
-| Archivo | Función | Sección del informe |
-| :--- | :--- | :---: |
-| `euler_cosner.py`, `rk2_cosner.py` | `F_PN`, `F_SN`, `F_SP` | 2.2 |
-| `euler_cosner.py`, `rk2_cosner.py` | `sistema_cosner` | 2.1 |
-| `euler_cosner.py` | `resolver_euler` | 3.1 |
-| `rk2_cosner.py` | `resolver_rk2` | 3.2 |
-| `generar_figuras.py` | `PARAMETROS`, `ESTADO_INICIAL` | 2.3 |
-| `generar_figuras.py` | `jacobiano`, `equilibrio_newton` | 2.4, 3.5 |
-| `generar_figuras.py` | `paso_maximo_estable` | 3.3, 4.3 |
-| `generar_figuras.py` | `diferencia_doble_paso` | 3.4, 4.3 |
-| `generar_figuras.py` | `K_critico_hopf`, `exponente_lyapunov` | 3.5, 4.5 |
-| `generar_figuras.py` | `figura_1_...` a `figura_6_...` | 4.1 – 4.5 |
-
-Ejecución: `python docs/generar_figuras.py` (requiere `numpy` y `matplotlib`; las imágenes se guardan en `docs/figuras/`).
+Los siguientes archivos contienen las ecuaciones y los métodos ejecutables por separado. El código de generación de figuras y de validación complementaria está disponible en el [repositorio del proyecto](https://github.com/carlix-27/predator-prey-simulation).
 
 <!-- ANEXO:INICIO (sección generada por construir_informe.py a partir de los .py; no editar a mano) -->
 
@@ -664,404 +622,6 @@ if __name__ == '__main__':
     plt.close()
 
     print("Simulación con RK2 completada. Gráficos 'evolucion_asintotica_rk2.png' y 'fases_3d_rk2.png' generados con éxito.")
-```
-
-### A.3. `generar_figuras.py`: Análisis, figuras y tablas del informe
-
-```python
-"""
-===============================================================================
-Trabajo Práctico: Cálculo Numérico - Modelo Tritrófico de Cosner
-Archivo: generar_figuras.py
-Propósito: Generar todas las figuras y tablas numéricas del informe
-===============================================================================
-Descripción:
-    Reutiliza el campo vectorial y los integradores implementados en
-    euler_cosner.py y rk2_cosner.py (no reimplementa ningún método) y produce:
-
-        Figura 1: Evolución temporal N(t), P(t), S(t) con RK2 (dt elegido).
-        Figura 2: Espacio de fases 3D (N, P, S).
-        Figura 3: Sensibilidad al paso dt: Euler vs. RK2.
-        Figura 4: Orden de convergencia observado (criterio de doble paso).
-        Figura 5: Diagrama de bifurcación respecto de la capacidad de carga K.
-        Figura 6: Régimen caótico: atractor extraño y sensibilidad a y0.
-
-    Además imprime en consola el punto de equilibrio, los autovalores del
-    Jacobiano, los pasos máximos estables, la bifurcación de Hopf, los
-    exponentes de Lyapunov y la tabla del criterio de doble paso del informe.
-
-Ejecución:
-    python docs/generar_figuras.py      (las imágenes se guardan en docs/figuras/)
-===============================================================================
-"""
-
-import os
-
-import numpy as np
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
-from euler_cosner import resolver_euler
-from rk2_cosner import sistema_cosner, resolver_rk2
-
-
-# =============================================================================
-# 1. CONFIGURACIÓN (Tabla de la Sección 2.3 del Informe)
-# =============================================================================
-
-PARAMETROS = {
-    'r': 1.0,           # Natalidad de la presa
-    'K': 10.0,          # Capacidad de carga
-    'd': 0.1,           # Mortalidad de la presa
-    'b': 0.5,           # Eficiencia conversión presa -> depredador
-    'm': 0.1,           # Mortalidad depredador
-    'f': 0.2,           # Eficiencia conversión presa -> superdepredador
-    'g': 0.4,           # Eficiencia conversión depredador -> superdepredador
-    'q': 0.12,          # Mortalidad superdepredador
-    'a': 0.15,          # Tasa de ataque F_PN (0.01 - 0.5)
-    'c_ataque': 0.05,   # Tasa de ataque F_SN (0.01 - 0.5)
-    'e': 0.10,          # Tasa de ataque F_SP (0.01 - 0.5)
-    'b1': 0.1,          # Coeficiente lineal N en F_PN (0.1 - 2.0)
-    'b2': 0.5,          # Coeficiente lineal N en F_SN (0.1 - 2.0)
-    'b3': 0.1,          # Coeficiente lineal P en F_SP (0.1 - 2.0)
-    'c1': 0.01,         # Coeficiente cuadrático N^2 en F_PN (0.0 - 0.1)
-    'c2': 0.01,         # Coeficiente cuadrático N^2 en F_SN (0.0 - 0.1)
-    'c3': 0.01          # Coeficiente cuadrático P^2 en F_SP (0.0 - 0.1)
-}
-
-ESTADO_INICIAL = np.array([8.0, 2.0, 1.0])   # [N0, P0, S0]
-T_INICIO = 0.0
-T_FINAL = 250.0
-DT_ELEGIDO = 0.05
-
-CARPETA_FIGURAS = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'figuras')
-COLORES = {'N': 'tab:blue', 'P': 'tab:orange', 'S': 'tab:green'}
-
-
-# =============================================================================
-# 2. HERRAMIENTAS DE ANÁLISIS (Secciones 3.3 y 4 del Informe)
-# =============================================================================
-
-def jacobiano(y, params, h=1e-6):
-    """
-    Aproxima la matriz Jacobiana J = df/dy por diferencias centradas:
-        J[:, j] = (f(y + h e_j) - f(y - h e_j)) / (2h)
-    """
-    J = np.zeros((3, 3))
-    for j in range(3):
-        e_j = np.zeros(3)
-        e_j[j] = h
-        J[:, j] = (sistema_cosner(0.0, y + e_j, params) - sistema_cosner(0.0, y - e_j, params)) / (2.0 * h)
-    return J
-
-
-def equilibrio_newton(y_semilla, params, tol=1e-12, max_iter=50):
-    """
-    Refina un punto de equilibrio f(y*) = 0 con el método de Newton-Raphson:
-        J(y_k) * delta = -f(y_k),   y_{k+1} = y_k + delta
-    """
-    y = np.array(y_semilla, dtype=float)
-    for _ in range(max_iter):
-        delta = np.linalg.solve(jacobiano(y, params), -sistema_cosner(0.0, y, params))
-        y = y + delta
-        if np.max(np.abs(delta)) < tol:
-            break
-    return y
-
-
-def paso_maximo_estable(autovalores, factor_amplificacion, dt_max=50.0, n=500001):
-    """
-    Mayor dt tal que |R(lambda * dt)| <= 1 para todos los autovalores (ecuación test
-    de Dahlquist). R(z) = 1 + z para Euler y R(z) = 1 + z + z^2/2 para RK2.
-    """
-    pasos = np.linspace(0.0, dt_max, n)[1:]
-    inestable = np.zeros_like(pasos, dtype=bool)
-    for lam in autovalores:
-        inestable |= np.abs(factor_amplificacion(lam * pasos)) > 1.0
-    return pasos[np.argmax(inestable)] if inestable.any() else np.inf
-
-
-def max_parte_real(params, y_semilla):
-    y = equilibrio_newton(y_semilla, params)
-    return np.max(np.linalg.eigvals(jacobiano(y, params)).real)
-
-
-def K_critico_hopf(params, K_estable, K_inestable, y_semilla, tol=1e-4):
-    """
-    Bisección sobre K del máximo Re(lambda) en el equilibrio interior:
-    el valor donde cruza el cero es la bifurcación de Hopf.
-    """
-    while K_inestable - K_estable > tol:
-        K_medio = 0.5 * (K_estable + K_inestable)
-        if max_parte_real(dict(params, K=K_medio), y_semilla) < 0.0:
-            K_estable = K_medio
-        else:
-            K_inestable = K_medio
-    return 0.5 * (K_estable + K_inestable)
-
-
-def diferencia_doble_paso(resolver, dt, params, y0=ESTADO_INICIAL, t_max=T_FINAL):
-    """
-    Criterio de doble paso (Runge / Richardson):
-        D(dt) = max_n || y_dt(t_n) - y_{dt/2}(t_n) ||_inf
-    Se compara únicamente en los instantes comunes a ambas mallas.
-    """
-    t_grueso, y_grueso = resolver(sistema_cosner, y0, T_INICIO, t_max, dt, params)
-    t_fino, y_fino = resolver(sistema_cosner, y0, T_INICIO, t_max, dt / 2.0, params)
-    indices = np.searchsorted(t_fino, t_grueso)
-    indices = np.minimum(indices, len(t_fino) - 1)
-    previos = np.maximum(indices - 1, 0)
-    indices = np.where(abs(t_fino[previos] - t_grueso) < abs(t_fino[indices] - t_grueso), previos, indices)
-    validos = np.isclose(t_grueso, t_fino[indices], rtol=1e-12, atol=1e-12)
-    return np.max(np.abs(y_grueso[validos] - y_fino[indices[validos]]))
-
-
-def guardar(fig, nombre):
-    os.makedirs(CARPETA_FIGURAS, exist_ok=True)
-    ruta = os.path.join(CARPETA_FIGURAS, nombre)
-    fig.savefig(ruta, dpi=200, bbox_inches='tight')
-    plt.close(fig)
-    print(f"  -> {ruta}")
-
-
-# =============================================================================
-# 3. FIGURAS DEL INFORME (Sección 4)
-# =============================================================================
-
-def figura_1_evolucion(t, sol):
-    fig, ax = plt.subplots(figsize=(9, 4.5))
-    ax.plot(t, sol[:, 0], label='Presa $N(t)$', color=COLORES['N'], lw=2)
-    ax.plot(t, sol[:, 1], label='Depredador $P(t)$', color=COLORES['P'], lw=2)
-    ax.plot(t, sol[:, 2], label='Superdepredador $S(t)$', color=COLORES['S'], lw=2)
-    ax.set_xlabel('Tiempo $t$')
-    ax.set_ylabel('Densidad poblacional')
-    ax.set_title(f'Evolución temporal del sistema de Cosner (RK2, $\\Delta t$ = {DT_ELEGIDO})')
-    ax.grid(True, linestyle='--', alpha=0.6)
-    ax.legend()
-    guardar(fig, 'fig1_evolucion_temporal.png')
-
-
-def figura_2_fases_3d(sol):
-    fig = plt.figure(figsize=(7.5, 6))
-    ax = fig.add_subplot(111, projection='3d')
-    ax.plot(sol[:, 0], sol[:, 1], sol[:, 2], color='purple', lw=1.2)
-    ax.scatter(*sol[0], color='red', s=40, label='Condición inicial $y_0$')
-    ax.scatter(*sol[-1], color='green', s=60, label='Equilibrio $(N^*, P^*, S^*)$')
-    ax.set_xlabel('Presa $N$')
-    ax.set_ylabel('Depredador $P$')
-    ax.set_zlabel('Superdepredador $S$')
-    ax.set_title('Espacio de fases 3D (RK2)')
-    ax.legend(loc='upper left')
-    guardar(fig, 'fig2_fases_3d.png')
-
-
-def figura_3_euler_vs_rk2(params):
-    pasos = [2.0, 0.5, 0.1]
-    t_ref, sol_ref = resolver_rk2(sistema_cosner, ESTADO_INICIAL, T_INICIO, T_FINAL, 0.01, params)
-    fig, ejes = plt.subplots(2, 2, figsize=(11, 7), sharex=True, sharey='row')
-    metodos = [('Euler explícito', resolver_euler), ('RK2 (Heun)', resolver_rk2)]
-    for col, (nombre, resolver) in enumerate(metodos):
-        soluciones = {dt: resolver(sistema_cosner, ESTADO_INICIAL, T_INICIO, T_FINAL, dt, params) for dt in pasos}
-        for fila, (indice, especie) in enumerate([(1, 'depredador $P(t)$'), (2, 'superdepredador $S(t)$')]):
-            ax = ejes[fila, col]
-            ax.plot(t_ref, sol_ref[:, indice], color='black', lw=2.5, alpha=0.35, label='Referencia (RK2, $\\Delta t$ = 0.01)')
-            for dt in pasos:
-                t, sol = soluciones[dt]
-                ax.plot(t, sol[:, indice], lw=1.3, label=f'$\\Delta t$ = {dt}')
-            ax.set_title(f'{nombre}: {especie}')
-            ax.grid(True, linestyle='--', alpha=0.6)
-    for ax in ejes[1]:
-        ax.set_xlabel('Tiempo $t$')
-    for ax in ejes[:, 0]:
-        ax.set_ylabel('Densidad poblacional')
-    ejes[0, 1].legend(loc='upper right', fontsize=9)
-    guardar(fig, 'fig3_euler_vs_rk2_dt.png')
-
-
-def figura_4_orden_convergencia(params):
-    pasos = np.array([0.5, 0.25, 0.1, 0.05, 0.025, 0.01])
-    D_euler = np.array([diferencia_doble_paso(resolver_euler, dt, params) for dt in pasos])
-    D_rk2 = np.array([diferencia_doble_paso(resolver_rk2, dt, params) for dt in pasos])
-
-    print("\n  Tabla de doble paso  D(dt) = max_n ||y_dt - y_dt/2||_inf")
-    print(f"  {'dt':>7} | {'Euler':>11} | {'RK2':>11} | {'orden observado Euler':>15} | {'RK2':>6}")
-    for i, (dt, de, dr) in enumerate(zip(pasos, D_euler, D_rk2)):
-        if i + 1 < len(pasos):
-            r = pasos[i] / pasos[i + 1]
-            ordenes = f"{np.log(de / D_euler[i + 1]) / np.log(r):>15.2f} | {np.log(dr / D_rk2[i + 1]) / np.log(r):>6.2f}"
-        else:
-            ordenes = f"{'-':>15} | {'-':>6}"
-        print(f"  {dt:>7} | {de:>11.3e} | {dr:>11.3e} | {ordenes}")
-    # Pendiente ajustada en el rango asintótico (dt <= 0.1)
-    asintotico = pasos <= 0.1
-    orden_euler = np.polyfit(np.log(pasos[asintotico]), np.log(D_euler[asintotico]), 1)[0]
-    orden_rk2 = np.polyfit(np.log(pasos[asintotico]), np.log(D_rk2[asintotico]), 1)[0]
-    print(f"  Orden observado (pendiente log-log, dt <= 0.1): Euler = {orden_euler:.2f}, RK2 = {orden_rk2:.2f}")
-
-    fig, ax = plt.subplots(figsize=(7, 4.8))
-    ax.loglog(pasos, D_euler, 'o-', label=f'Euler (pendiente {orden_euler:.2f})')
-    ax.loglog(pasos, D_rk2, 's-', label=f'RK2 (pendiente {orden_rk2:.2f})')
-    ax.loglog(pasos, D_euler[-1] * (pasos / pasos[-1]), 'k--', lw=0.8, label='Referencia $\\mathcal{O}(\\Delta t)$')
-    ax.loglog(pasos, D_rk2[-1] * (pasos / pasos[-1]) ** 2, 'k:', lw=0.8, label='Referencia $\\mathcal{O}(\\Delta t^2)$')
-    ax.axhline(1e-3, color='gray', lw=0.8)
-    ax.text(pasos[0], 1.3e-3, 'tolerancia $10^{-3}$', ha='right', color='gray', fontsize=9)
-    ax.set_xlabel('Paso temporal $\\Delta t$')
-    ax.set_ylabel('$D(\\Delta t)=\\max_n\\|y_{\\Delta t}-y_{\\Delta t/2}\\|_\\infty$')
-    ax.set_title('Criterio de doble paso y orden de convergencia')
-    ax.grid(True, which='both', linestyle='--', alpha=0.5)
-    ax.legend()
-    guardar(fig, 'fig4_orden_convergencia.png')
-
-
-def maximos_locales(x):
-    """Máximos locales de una serie temporal muestreada."""
-    centro = x[1:-1]
-    return centro[(centro > x[:-2]) & (centro >= x[2:])]
-
-
-def exponente_lyapunov(params, y0=ESTADO_INICIAL, dt=DT_ELEGIDO, t_transitorio=2000.0,
-                       t_promedio=4000.0, tau=2.0, d0=1e-8):
-    """
-    Máximo exponente de Lyapunov por el método de dos trayectorias (Benettin):
-    se integra con RK2 una trayectoria de referencia y otra separada d0, se acumula
-    log(d / d0) cada tau unidades de tiempo y se renormaliza la separación a d0.
-        lambda_max > 0  ->  divergencia exponencial de trayectorias vecinas (caos)
-        lambda_max ~ 0  ->  ciclo límite (órbita periódica)
-        lambda_max < 0  ->  equilibrio estable
-    """
-    _, sol = resolver_rk2(sistema_cosner, y0, 0.0, t_transitorio, dt, params)
-    y = sol[-1]
-    v = np.ones(3) / np.sqrt(3.0) * d0
-    suma = 0.0
-    n = int(t_promedio / tau)
-    for _ in range(n):
-        _, ref = resolver_rk2(sistema_cosner, y, 0.0, tau, dt, params)
-        _, pert = resolver_rk2(sistema_cosner, y + v, 0.0, tau, dt, params)
-        y, separacion = ref[-1], pert[-1] - ref[-1]
-        d = np.linalg.norm(separacion)
-        suma += np.log(d / d0)
-        v = separacion * (d0 / d)
-    return suma / (n * tau)
-
-
-def figura_5_bifurcacion_K(params, K_hopf):
-    """
-    Diagrama de bifurcación respecto de la capacidad de carga K: para cada K se
-    descarta el transitorio y se grafican los máximos locales de N(t) y S(t).
-        Un máximo repetido puede corresponder a un ciclo; una nube indica
-        irregularidad y requiere otras pruebas para diagnosticar caos.
-        Si no se detectan máximos se grafica el último valor, no necesariamente un equilibrio.
-    """
-    valores_K = np.arange(9.0, 15.001, 0.025)
-    t_transitorio, t_total = 2000.0, 3000.0
-    fig, ejes = plt.subplots(1, 2, figsize=(11, 4.3))
-    for K in valores_K:
-        t, sol = resolver_rk2(sistema_cosner, ESTADO_INICIAL, T_INICIO, t_total, DT_ELEGIDO, dict(params, K=K))
-        cola = sol[t > t_transitorio]
-        for ax, indice, color in [(ejes[0], 0, COLORES['N']), (ejes[1], 2, COLORES['S'])]:
-            maximos = maximos_locales(cola[:, indice])
-            if maximos.size == 0 or np.ptp(cola[:, indice]) < 1e-4:
-                maximos = cola[-1:, indice]
-            ax.plot(np.full(maximos.size, K), maximos, ',', color=color, alpha=0.8)
-            ax.plot(np.full(maximos.size, K), maximos, '.', color=color, ms=1.2, alpha=0.6)
-    for ax, especie in zip(ejes, ['presa $N$', 'superdepredador $S$']):
-        ax.axvline(K_hopf, color='red', ls='--', lw=1, label=f'Hopf $K_H \\approx$ {K_hopf:.2f}')
-        ax.axvline(params['K'], color='gray', ls=':', lw=1.2, label=f'Valor adoptado $K$ = {params["K"]:g}')
-        ax.set_xlabel('Capacidad de carga $K$')
-        ax.set_ylabel(f'Máximos locales de {especie}')
-        ax.grid(True, linestyle='--', alpha=0.5)
-        ax.legend(loc='upper left', fontsize=9)
-    ejes[0].set_title('Diagrama de bifurcación: presa')
-    ejes[1].set_title('Diagrama de bifurcación: superdepredador')
-    guardar(fig, 'fig5_bifurcacion_K.png')
-
-
-def figura_6_caos(params, K_caos, lyap):
-    """
-    Régimen caótico (K = K_caos): atractor extraño y sensibilidad a condiciones iniciales.
-    """
-    p = dict(params, K=K_caos)
-    t, sol = resolver_rk2(sistema_cosner, ESTADO_INICIAL, T_INICIO, 3000.0, DT_ELEGIDO, p)
-    perturbado = ESTADO_INICIAL + np.array([1e-6, 0.0, 0.0])
-    _, sol_p = resolver_rk2(sistema_cosner, perturbado, T_INICIO, 3000.0, DT_ELEGIDO, p)
-    separacion = np.max(np.abs(sol - sol_p), axis=1)
-
-    fig = plt.figure(figsize=(13, 4.2))
-    ax3d = fig.add_subplot(1, 3, 1, projection='3d')
-    cola = t > 1500.0
-    ax3d.plot(sol[cola, 0], sol[cola, 1], sol[cola, 2], color='purple', lw=0.4)
-    ax3d.set_xlabel('$N$')
-    ax3d.set_ylabel('$P$')
-    ax3d.set_zlabel('$S$')
-    ax3d.set_title(f'Atractor extraño ($K$ = {K_caos:g})')
-
-    ax = fig.add_subplot(1, 3, 2)
-    ventana = (t >= 1500.0) & (t <= 2500.0)
-    ax.plot(t[ventana], sol[ventana, 0], lw=1.2, label='$y_0$')
-    ax.plot(t[ventana], sol_p[ventana, 0], '--', lw=1.2, label='$y_0 + (10^{-6}, 0, 0)$')
-    ax.set_xlabel('Tiempo $t$')
-    ax.set_ylabel('Presa $N(t)$')
-    ax.set_title('Sensibilidad a condiciones iniciales')
-    ax.set_ylim(0.0, 13.0)
-    ax.grid(True, linestyle='--', alpha=0.5)
-    ax.legend(loc='upper center', ncol=2, fontsize=9)
-
-    ax = fig.add_subplot(1, 3, 3)
-    ax.semilogy(t, separacion, lw=0.8, color='tab:red')
-    # Recta de referencia con pendiente lambda, anclada en la media geométrica de la separación en t ~ 400
-    ancla = np.exp(np.mean(np.log(separacion[(t > 300.0) & (t < 500.0)])))
-    t_ref = np.array([400.0, 1800.0])
-    ax.semilogy(t_ref, ancla * np.exp(lyap * (t_ref - 400.0)), 'k--', lw=1.2,
-                label=f'$e^{{\\lambda t}}$, $\\lambda$ = {lyap:.4f}')
-    ax.set_xlabel('Tiempo $t$')
-    ax.set_ylabel('$\\|y(t) - \\tilde{y}(t)\\|_\\infty$')
-    ax.set_title('Divergencia de trayectorias vecinas')
-    ax.grid(True, which='both', linestyle='--', alpha=0.4)
-    ax.legend(loc='lower right', fontsize=9)
-    fig.tight_layout()
-    guardar(fig, 'fig6_regimen_caotico.png')
-
-
-# =============================================================================
-# 4. EJECUCIÓN
-# =============================================================================
-
-if __name__ == '__main__':
-    t, sol = resolver_rk2(sistema_cosner, ESTADO_INICIAL, T_INICIO, T_FINAL, DT_ELEGIDO, PARAMETROS)
-    equilibrio = equilibrio_newton(sol[-1], PARAMETROS)
-    autovalores = np.linalg.eigvals(jacobiano(equilibrio, PARAMETROS))
-    print(f"Equilibrio interior (Newton) (N*, P*, S*) = {np.round(equilibrio, 4)}")
-    print(f"Residuo ||f(y*)||_inf = {np.max(np.abs(sistema_cosner(0.0, equilibrio, PARAMETROS))):.2e}")
-    print(f"Distancia ||y(T_FINAL) - y*||_inf = {np.max(np.abs(sol[-1] - equilibrio)):.2e}")
-    print(f"Autovalores del Jacobiano en y*: {np.round(autovalores, 4)}")
-
-    dt_euler = paso_maximo_estable(autovalores, lambda z: 1 + z)
-    dt_rk2 = paso_maximo_estable(autovalores, lambda z: 1 + z + z ** 2 / 2)
-    print(f"Paso máximo linealmente estable en y*: Euler = {dt_euler:.2f}, RK2 = {dt_rk2:.2f}")
-
-    # Equilibrio de borde sin superdepredador (S = 0 es invariante)
-    borde = equilibrio_newton([1.6, 5.9, 0.0], PARAMETROS)
-    autovalores_borde = np.linalg.eigvals(jacobiano(borde, PARAMETROS))
-    print(f"Equilibrio de borde (N, P, 0) = {np.round(borde, 4)}, autovalores: {np.round(autovalores_borde, 4)}")
-    print(f"  |1 + lambda*dt| de Euler con dt = 2 en el borde: {np.round(np.abs(1 + 2.0 * autovalores_borde), 3)}")
-
-    K_hopf = K_critico_hopf(PARAMETROS, 10.0, 12.0, equilibrio)
-    print(f"Bifurcación de Hopf en K_H = {K_hopf:.3f}")
-
-    print("\nMáximo exponente de Lyapunov (RK2, dt = 0.05):")
-    exponentes = {}
-    for K in [10.0, 11.5, 12.0, 12.25, 13.5]:
-        exponentes[K] = exponente_lyapunov(dict(PARAMETROS, K=K))
-        print(f"  K = {K:>5}: lambda_max = {exponentes[K]:+.4f}")
-
-    print("\nGenerando figuras:")
-    figura_1_evolucion(t, sol)
-    figura_2_fases_3d(sol)
-    figura_3_euler_vs_rk2(PARAMETROS)
-    figura_4_orden_convergencia(PARAMETROS)
-    figura_5_bifurcacion_K(PARAMETROS, K_hopf)
-    figura_6_caos(PARAMETROS, 13.5, exponentes[13.5])
 ```
 
 <!-- ANEXO:FIN -->
